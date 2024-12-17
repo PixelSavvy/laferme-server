@@ -1,10 +1,7 @@
 {
   "type": "commonjs",
   "scripts": {
-    "build": "rimraf dist && npx tsc",
-    "prestart": "npm run build",
     "start": "NODE_ENV=production node dist/server.js",
-    "preserve": "npm run build",
     "serve": "NODE_ENV=development concurrently \"tsc -w\" \"nodemon dist/server.js\""
   },
   "_moduleAliases": {
