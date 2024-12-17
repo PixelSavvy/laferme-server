@@ -12,7 +12,7 @@ pnpm-debug.log*
 
 # Dependency directories
 jspm_packages/
-dist/
+
 build/
 .tmp/
 .cache/
