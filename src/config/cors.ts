@@ -12,4 +12,6 @@ export const corsOptions: CorsOptions = {
 
   credentials: true, // Allow credentials (cookies, etc.)
   optionsSuccessStatus: 200, // For legacy browser support
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allow these methods
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
