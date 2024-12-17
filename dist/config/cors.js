@@ -4,14 +4,14 @@ exports.corsOptions = void 0;
 const origins_1 = require("./origins");
 exports.corsOptions = {
     origin: (origin, callback) => {
-        if (!origin || origins_1.allowedOrigins.includes(origin)) {
+        if (origins_1.allowedOrigins.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         }
         else {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true, // Allow credentials (cookies, etc.)
-    optionsSuccessStatus: 200, // For legacy browser support
+    credentials: true,
+    optionsSuccessStatus: 200,
 };
 //# sourceMappingURL=cors.js.map
