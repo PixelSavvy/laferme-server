@@ -7,18 +7,16 @@ const sequelize_1 = require("sequelize");
 // Determine the environment
 const environment = process.env.NODE_ENV || 'development';
 const configEnv = _config_1.dbConfig[environment];
-const sequelize = new sequelize_1.Sequelize(configEnv.database, configEnv.username, configEnv.password, {
-    host: configEnv.host,
-    port: parseInt(configEnv.port || '5432', 10),
+const sequelize = new sequelize_1.Sequelize(process.env.DB_URL, {
     dialect: 'postgres',
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false,
+        },
+    },
     schema: configEnv.schema,
     logging: false,
-    pool: {
-        max: 10,
-        min: 0,
-        acquire: 30000,
-        idle: 10000,
-    },
 });
 exports.sequelize = sequelize;
 const connectDB = async () => {
