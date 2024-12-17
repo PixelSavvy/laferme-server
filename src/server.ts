@@ -1,5 +1,6 @@
 import 'dotenv/config';
 
+import cors from 'cors';
 import express from 'express';
 
 import cookieParser from 'cookie-parser';
@@ -13,6 +14,16 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const app = express();
 
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: '*',
+    credentials: true,
+    optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
