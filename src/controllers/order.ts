@@ -1,6 +1,6 @@
-import { sendResponse } from '@/helpers';
-import { distributionServices, freezoneServices, orderServices } from '@/services';
-import { newOrderSchema, orderSchema } from '@/validations';
+import { sendResponse } from '@helpers';
+import { distributionServices, freezoneServices, orderServices } from '@services';
+import { newOrderSchema, orderSchema } from '@validations';
 import { Request, Response } from 'express';
 
 const addOrder = async (req: Request, res: Response) => {

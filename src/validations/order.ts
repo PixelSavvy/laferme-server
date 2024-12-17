@@ -1,4 +1,4 @@
-import { orderStatus } from '@/config';
+import { orderStatus } from '@config';
 import { z } from 'zod';
 
 const REQUIRED_ERROR_MSG = 'სავალდებულოა';

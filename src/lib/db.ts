@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { Config, dbConfig } from '@/config';
+import { Config, dbConfig } from '@config';
 import { Sequelize } from 'sequelize';
 
 // Determine the environment

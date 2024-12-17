@@ -1,10 +1,10 @@
 import { BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { z } from 'zod';
 
-import { sequelize } from '@/lib';
+import { sequelize } from '@lib';
 
-import { paymentOptions, priceIndex } from '@/config';
-import { customerSchema as schema } from '@/validations';
+import { paymentOptions, priceIndex } from '@config';
+import { customerSchema as schema } from '@validations';
 import { ProductInstance } from './product';
 
 const PAYMENT_OPTIONS = Object.values(paymentOptions);

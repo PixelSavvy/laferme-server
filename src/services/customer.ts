@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 
-import { Customer, Product, ProductInstance } from '@/models';
-import { customerSchema, newCustomerSchema } from '@/validations';
+import { Customer, Product, ProductInstance } from '@models';
+import { customerSchema, newCustomerSchema } from '@validations';
 
-import { paymentOptions, priceIndex } from '@/config';
-import { sendResponse } from '@/helpers';
-import { sequelize } from '@/lib';
+import { paymentOptions, priceIndex } from '@config';
+import { sendResponse } from '@helpers';
+import { sequelize } from '@lib';
 import { Op } from 'sequelize';
 
 const addCustomer = async (req: Request, res: Response, data: z.infer<typeof newCustomerSchema>) => {

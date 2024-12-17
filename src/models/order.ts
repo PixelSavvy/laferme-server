@@ -1,9 +1,9 @@
 import { BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { z } from 'zod';
 
-import { orderStatus } from '@/config';
-import { sequelize } from '@/lib';
-import { orderSchema as schema } from '@/validations';
+import { orderStatus } from '@config';
+import { sequelize } from '@lib';
+import { orderSchema as schema } from '@validations';
 import { CustomerInstance } from './customer';
 import { OrderProductInstance } from './orderProduct';
 

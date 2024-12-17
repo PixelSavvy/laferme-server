@@ -1,6 +1,6 @@
-import { sendResponse } from '@/helpers';
-import { freezoneServices } from '@/services';
-import { freezoneItemSchema } from '@/validations';
+import { sendResponse } from '@helpers';
+import { freezoneServices } from '@services';
+import { freezoneItemSchema } from '@validations';
 import { Request, Response } from 'express';
 
 const getFreezoneItem = async (req: Request, res: Response) => {

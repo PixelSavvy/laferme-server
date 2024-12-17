@@ -1,4 +1,4 @@
-import { paymentOptions, priceIndex } from '@/config';
+import { paymentOptions, priceIndex } from '@config';
 import { z } from 'zod';
 import { productSchema } from './product';
 

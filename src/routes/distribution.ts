@@ -1,5 +1,5 @@
-import { paths } from '@/config';
-import { distributionController } from '@/controllers';
+import { paths } from '@config';
+import { distributionController } from '@controllers';
 import express from 'express';
 
 const router = express.Router();

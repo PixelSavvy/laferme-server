@@ -1,5 +1,5 @@
-import { sequelize } from '@/lib';
-import { productSchema } from '@/validations';
+import { sequelize } from '@lib';
+import { productSchema } from '@validations';
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { z } from 'zod';
 import { DistributionItemProductInstance } from './distributionItemProduct';

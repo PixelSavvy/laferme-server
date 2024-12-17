@@ -12,9 +12,17 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["src/*"]
+      "@config": ["config"],
+      "@controllers": ["controllers"],
+      "@models": ["models"],
+      "@routes": ["routes"],
+      "@services": ["services"],
+      "@utils": ["utils"],
+      "@lib": ["lib"],
+      "@validations": ["validations"],
+      "@helpers": ["helpers"]
     }
   },
   "include": ["./src/**/*"],

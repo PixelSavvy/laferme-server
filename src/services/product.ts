@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 
-import { sendResponse } from '@/helpers';
+import { sendResponse } from '@helpers';
 
-import { sequelize } from '@/lib';
-import { Product } from '@/models';
-import { newProductSchema, productSchema } from '@/validations';
+import { sequelize } from '@lib';
+import { Product } from '@models';
+import { newProductSchema, productSchema } from '@validations';
 
 const addProduct = async (req: Request, res: Response, data: z.infer<typeof newProductSchema>) => {
   const transaction = await sequelize.transaction();

@@ -1,14 +1,13 @@
 import 'dotenv/config';
-import 'module-alias/register';
 
 import cors from 'cors';
 import express from 'express';
 
 import cookieParser from 'cookie-parser';
 
-import { corsOptions, paths } from '@/config';
-import { connectDB } from '@/lib';
-import { customerRoutes, distributionRoutes, freezoneRoutes, orderRoutes, productRoutes } from '@/routes';
+import { corsOptions, paths } from '@config';
+import { connectDB } from '@lib';
+import { customerRoutes, distributionRoutes, freezoneRoutes, orderRoutes, productRoutes } from '@routes';
 
 const PORT = process.env.PORT || 8080;
 const NODE_ENV = process.env.NODE_ENV || 'development';

@@ -1,6 +1,6 @@
-import { sendResponse } from '@/helpers';
-import { distributionServices } from '@/services';
-import { distributionItemSchema } from '@/validations';
+import { sendResponse } from '@helpers';
+import { distributionServices } from '@services';
+import { distributionItemSchema } from '@validations';
 import { Request, Response } from 'express';
 
 const getDistributionItem = async (req: Request, res: Response) => {

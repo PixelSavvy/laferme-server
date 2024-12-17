@@ -1,4 +1,4 @@
-import { distributionStatus } from '@/config';
+import { distributionStatus } from '@config';
 import { z } from 'zod';
 import { freezoneItemProductsSchema } from './freezoneItem';
 

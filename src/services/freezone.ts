@@ -1,7 +1,7 @@
-import { sendResponse } from '@/helpers';
-import { sequelize } from '@/lib';
-import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from '@/models';
-import { freezoneItemSchema } from '@/validations';
+import { sendResponse } from '@helpers';
+import { sequelize } from '@lib';
+import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from '@models';
+import { freezoneItemSchema } from '@validations';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import { z } from 'zod';

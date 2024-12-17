@@ -1,6 +1,6 @@
-import { sendResponse } from '@/helpers';
-import { productServices } from '@/services';
-import { newProductSchema, productSchema } from '@/validations';
+import { sendResponse } from '@helpers';
+import { productServices } from '@services';
+import { newProductSchema, productSchema } from '@validations';
 import { Request, Response } from 'express';
 
 const getProducts = async (req: Request, res: Response) => {

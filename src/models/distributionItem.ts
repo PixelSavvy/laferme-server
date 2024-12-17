@@ -1,9 +1,9 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { z } from 'zod';
 
-import { distributionStatus } from '@/config';
-import { sequelize } from '@/lib';
-import { distributionItemSchema as schema } from '@/validations';
+import { distributionStatus } from '@config';
+import { sequelize } from '@lib';
+import { distributionItemSchema as schema } from '@validations';
 import { FreezoneItemInstance } from './freezoneItem';
 
 const distributionItemSchema = schema.omit({ products: true, createdAt: true, updatedAt: true, deletedAt: true });

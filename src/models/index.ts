@@ -123,6 +123,8 @@ Product.belongsToMany(DistributionItem, {
 });
 
 export * from './customer';
+export * from './distributionItem';
+export * from './distributionItemProduct';
 export * from './freezoneItem';
 export * from './freezoneItemProduct';
 export * from './order';

@@ -1,9 +1,9 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { z } from 'zod';
 
-import { orderStatus } from '@/config';
-import { sequelize } from '@/lib';
-import { freezoneItemSchema as schema } from '@/validations';
+import { orderStatus } from '@config';
+import { sequelize } from '@lib';
+import { freezoneItemSchema as schema } from '@validations';
 
 const freezoneItemSchema = schema.omit({ products: true, createdAt: true, updatedAt: true, deletedAt: true });
 const FREEZONE_ITEM_STATUS = Object.values(orderStatus);

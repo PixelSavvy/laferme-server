@@ -1,4 +1,4 @@
-import { sequelize } from '@/lib';
+import { sequelize } from '@lib';
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 
 interface OrderProductInstance
