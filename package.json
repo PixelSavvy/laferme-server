@@ -2,9 +2,9 @@
   "type": "commonjs",
   "scripts": {
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
-    "prod": "npm run build && node -r ./prod-paths.js ./dist/server.js",
-    "build": "NODE_ENV=production npm run build-ts",
-    "build-ts": "tsc -p ."
+    "prod": "NODE_ENV=production npm run build && node -r ./prod-paths.js ./dist/server.js",
+    "build": "NODE_ENV=production tsc -p .",
+    "start": "node -r tsconfig-paths/register ./dist/server.js"
   },
   "main": "dist/server.js",
   "dependencies": {
@@ -12,7 +12,8 @@
     "concurrently": "^9.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^7.4.4",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.1",

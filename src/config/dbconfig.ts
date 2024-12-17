@@ -1,31 +1,35 @@
-export interface DbConfig {
-  username: string | undefined;
-  password: string | undefined;
-  database: string | undefined;
-  host: string | undefined;
-  port: string | undefined;
-  schema: string | undefined;
-}
+import { Options } from 'sequelize';
 
-export interface Config {
-  development: DbConfig;
-  production: DbConfig;
+import { getEnvVar } from '@helpers';
+
+interface DbConfig {
+  [key: string]: Options;
 }
-export const dbConfig: Config = {
+export const dbConfig: DbConfig = {
   development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    schema: process.env.DB_SCHEMA,
+    dialect: 'postgres',
+    host: getEnvVar('DB_HOST'),
+    port: Number(getEnvVar('DB_PORT', '5432')),
+    username: getEnvVar('DB_USER'),
+    password: getEnvVar('DB_PASSWORD'),
+    database: getEnvVar('DB_NAME'),
+    logging: false,
+    schema: getEnvVar('DB_SCHEMA', 'operations'),
   },
   production: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    schema: process.env.DB_SCHEMA,
+    dialect: 'postgres',
+    host: getEnvVar('DB_HOST'),
+    port: Number(getEnvVar('DB_PORT', '5432')),
+    username: getEnvVar('DB_USER'),
+    password: getEnvVar('DB_PASSWORD'),
+    database: getEnvVar('DB_NAME'),
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+    logging: false,
+    schema: getEnvVar('DB_SCHEMA', 'operations'),
   },
 };

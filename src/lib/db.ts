@@ -1,30 +1,25 @@
 import 'dotenv/config';
 
-import { Config, dbConfig } from '@config';
+import { dbConfig } from '@config';
+import { getEnvVar } from '@helpers';
 import { Sequelize } from 'sequelize';
 
 // Determine the environment
-const environment = process.env.NODE_ENV || 'development';
-const configEnv = dbConfig[environment as keyof Config];
+const environment = getEnvVar('NODE_ENV', 'development');
+const config = dbConfig[environment];
 
-const sequelize = new Sequelize(process.env.DB_URL! as string, {
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
-  schema: configEnv.schema,
-  logging: false,
-});
+const sequelize = new Sequelize(config);
 
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connected!');
     await sequelize.query(`CREATE SCHEMA IF NOT EXISTS operations`);
-    await sequelize.sync({ alter: true, force: false, match: /_dev$/ });
+    await sequelize.sync({
+      alter: environment === 'development',
+      force: false,
+      match: /_dev$/,
+    });
     console.log('Database synchronized!');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
