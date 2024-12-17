@@ -1,4 +1,3 @@
-// config/cors.ts
 import { CorsOptions } from 'cors';
 import { allowedOrigins } from './origins';
 

@@ -2,7 +2,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
-    "prod": "npm run build && node -r ./prod-paths.js ./dist/server.js",
+    "prod": "node -r ./prod-paths.js ./dist/server.js",
     "build": "NODE_ENV=production npm run build-ts",
     "build-ts": "tsc -p ."
   },
