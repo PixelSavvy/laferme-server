@@ -24,7 +24,7 @@ app.use(paths.root, orderRoutes);
 app.use(paths.root, freezoneRoutes);
 app.use(paths.root, distributionRoutes);
 
-app.listen(PORT, async () => {
+app.listen(`0.0.0.0:${PORT}`, async () => {
   console.log(`Server is running on PORT ${PORT} on an ${NODE_ENV.toUpperCase()} environment`);
 
   await connectDB();
