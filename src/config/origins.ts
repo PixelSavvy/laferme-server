@@ -1,1 +1,1 @@
-export const allowedOrigins = ['http://localhost:5173', 'https://laferme-client.vercel.app'];
+export const allowedOrigins = ['*'];
