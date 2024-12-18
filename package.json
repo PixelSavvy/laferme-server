@@ -1,10 +1,20 @@
 {
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
     "prod": "NODE_ENV=production npm run build && node -r ./prod-paths.js ./dist/server.js",
     "build": "NODE_ENV=production tsc -p .",
-    "start": "node -r tsconfig-paths/register ./dist/server.js"
+    "start": "node -r tsconfig-paths/register ./dist/server.js",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "eslint . --cache --format  stylish --fix",
+      "prettier --write"
+    ],
+    "**/*.{json,md,css,scss,html,js,jsx,ts,tsx}": [
+      "npx prettier . --write"
+    ]
   },
   "main": "dist/server.js",
   "dependencies": {
@@ -36,6 +46,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin": "^1.0.1",
+    "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prefer-arrow-functions": "^3.4.1",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.12.0",

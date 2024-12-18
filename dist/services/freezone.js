@@ -1,24 +1,21 @@
-import { sendResponse } from '@helpers';
-import { sequelize } from '@lib';
-import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from '@models';
-import { freezoneItemSchema, orderSchema } from '@validations';
-import { Request, Response } from 'express';
-import { Op } from 'sequelize';
-import { z } from 'zod';
-
-const addFreezoneItem = async (req: Request, res: Response, orderId: number) => {
-  const transaction = await sequelize.transaction();
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
+exports.freezoneServices = void 0;
+const _helpers_1 = require('@helpers');
+const _lib_1 = require('@lib');
+const _models_1 = require('@models');
+const sequelize_1 = require('sequelize');
+const addFreezoneItem = async (req, res, orderId) => {
+  const transaction = await _lib_1.sequelize.transaction();
   try {
     // Fetch associated order
-    const order = await Order.findByPk(orderId, {
+    const order = await _models_1.Order.findByPk(orderId, {
       transaction,
       raw: true,
     });
-
     if (!order) return;
-
     // Create a freezoneItem
-    const newFreezoneItem = await FreezoneItem.create(
+    const newFreezoneItem = await _models_1.FreezoneItem.create(
       {
         id: orderId,
         orderId: orderId,
@@ -26,43 +23,37 @@ const addFreezoneItem = async (req: Request, res: Response, orderId: number) => 
       },
       { transaction }
     );
-
     // Fetch associated order products
-    const orderProducts = await OrderProduct.findAll({
+    const orderProducts = await _models_1.OrderProduct.findAll({
       where: {
         orderId: order.id,
       },
       raw: true,
     });
-
     const transformedFreezoneItemProducts = orderProducts.map((product) => ({
       ...product,
       freezoneItemId: newFreezoneItem.id,
       adjustedWeight: 0,
       adjustedQuantity: 0,
     }));
-
-    const freezoneItemProducts = await FreezoneItemProduct.bulkCreate(transformedFreezoneItemProducts, { transaction });
-
+    const freezoneItemProducts = await _models_1.FreezoneItemProduct.bulkCreate(transformedFreezoneItemProducts, {
+      transaction,
+    });
     if (freezoneItemProducts.length === 0) return;
-
     await transaction.commit();
-
     const freezoneItemId = newFreezoneItem.id;
-
     return freezoneItemId;
   } catch (error) {
     await transaction.rollback();
     throw error;
   }
 };
-
-const getFreezoneItem = async (req: Request, res: Response, id: number) => {
+const getFreezoneItem = async (req, res, id) => {
   try {
-    const freezoneItem = await FreezoneItem.findByPk(id, {
+    const freezoneItem = await _models_1.FreezoneItem.findByPk(id, {
       include: [
         {
-          model: Product,
+          model: _models_1.Product,
           as: 'products',
           attributes: ['id', 'title', 'productCode'],
           through: {
@@ -72,21 +63,18 @@ const getFreezoneItem = async (req: Request, res: Response, id: number) => {
         },
       ],
     });
-
-    if (!freezoneItem) return sendResponse(res, 404, 'მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა');
-
+    if (!freezoneItem) return (0, _helpers_1.sendResponse)(res, 404, 'მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა');
     return freezoneItem;
   } catch (error) {
     throw error;
   }
 };
-
-const getFreezoneItems = async (req: Request, res: Response, id: number) => {
+const getFreezoneItems = async (req, res, id) => {
   try {
-    const existingFreezoneItems = await FreezoneItem.findAll({
+    const existingFreezoneItems = await _models_1.FreezoneItem.findAll({
       include: [
         {
-          model: Product,
+          model: _models_1.Product,
           as: 'products',
           attributes: ['id', 'title', 'productCode'],
           through: {
@@ -96,24 +84,21 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
         },
       ],
     });
-
     if (existingFreezoneItems.length === 0)
       return {
         exists: false,
         freezoneItems: existingFreezoneItems,
       };
-
     const orderIds = existingFreezoneItems.map((item) => item.orderId);
-
-    const customers = await Order.findAll({
+    const customers = await _models_1.Order.findAll({
       where: {
-        [Op.or]: {
+        [sequelize_1.Op.or]: {
           id: orderIds,
         },
       },
       include: [
         {
-          model: Customer,
+          model: _models_1.Customer,
           as: 'customer',
           attributes: {
             exclude: ['createdAt', 'updatedAt', 'deletedAt'],
@@ -121,16 +106,13 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
         },
       ],
     });
-
     const transformedFreezoneItems = existingFreezoneItems.map((item) => {
       const order = customers.find((customer) => customer.id === item.orderId);
-
       return {
         ...item.toJSON(),
         customer: order?.customer,
       };
     });
-
     return {
       exists: true,
       freezoneItems: transformedFreezoneItems,
@@ -139,13 +121,10 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
     throw error;
   }
 };
-
-const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typeof freezoneItemSchema>) => {
-  const transaction = await sequelize.transaction();
-
+const updateFreezoneItem = async (req, res, data) => {
+  const transaction = await _lib_1.sequelize.transaction();
   try {
-    const existingFreezoneItem = await FreezoneItem.findByPk(data.id, { transaction });
-
+    const existingFreezoneItem = await _models_1.FreezoneItem.findByPk(data.id, { transaction });
     if (!existingFreezoneItem) {
       await transaction.rollback();
       return {
@@ -153,11 +132,8 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
         freezoneItem: existingFreezoneItem,
       };
     }
-
-    const { products, ...freezoneItemData } = data;
     // Update the order
-    const updatedFreezoneItem = await existingFreezoneItem.update(freezoneItemData, { transaction });
-
+    const updatedFreezoneItem = await existingFreezoneItem.update(data, { transaction });
     // Rebuild the `FreezoneItemProduct` associations
     const freezoneItemProducts = data.products.map((product) => ({
       freezoneItemId: updatedFreezoneItem.id,
@@ -168,18 +144,14 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
       adjustedWeight: product.adjustedWeight,
       adjustedQuantity: product.adjustedQuantity,
     }));
-
     // Replace existing associations with the new ones
-    await FreezoneItemProduct.destroy({
+    await _models_1.FreezoneItemProduct.destroy({
       where: { freezoneItemId: updatedFreezoneItem.id },
       transaction,
     });
-
-    await FreezoneItemProduct.bulkCreate(freezoneItemProducts, { transaction });
-
+    await _models_1.FreezoneItemProduct.bulkCreate(freezoneItemProducts, { transaction });
     // Commit the transaction
     await transaction.commit();
-
     return {
       exists: true,
       order: updatedFreezoneItem,
@@ -190,20 +162,16 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
     throw error;
   }
 };
-
-const updateOrderFreezoneItem = async (data: z.infer<typeof orderSchema>) => {
-  const transaction = await sequelize.transaction();
-
+const updateOrderFreezoneItem = async (data) => {
+  const transaction = await _lib_1.sequelize.transaction();
   try {
-    const existingFreezoneItem = await FreezoneItem.findOne({
+    const existingFreezoneItem = await _models_1.FreezoneItem.findOne({
       where: { orderId: data.id },
       transaction,
     });
-
     if (!existingFreezoneItem) {
       return { exists: false, freezoneItem: null };
     }
-
     const products = data.products.map((product) => ({
       freezoneItemId: existingFreezoneItem.id,
       productId: product.productId,
@@ -211,19 +179,15 @@ const updateOrderFreezoneItem = async (data: z.infer<typeof orderSchema>) => {
       weight: product.weight,
       quantity: product.quantity,
     }));
-
-    const existingFreezoneItemProducts = await FreezoneItemProduct.findAll({
+    const existingFreezoneItemProducts = await _models_1.FreezoneItemProduct.findAll({
       where: {
         freezoneItemId: existingFreezoneItem.id,
       },
       transaction,
     });
-
     const updatedFreezoneItemProducts = existingFreezoneItemProducts.map((existingProduct) => {
       const product = products.find((p) => p.productId === existingProduct.productId);
-
       if (!product) return existingProduct;
-
       return {
         freezoneItemId: data.id,
         productId: product.productId,
@@ -234,26 +198,23 @@ const updateOrderFreezoneItem = async (data: z.infer<typeof orderSchema>) => {
         adjustedQuantity: existingProduct.adjustedQuantity,
       };
     });
-
-    await FreezoneItemProduct.bulkCreate(updatedFreezoneItemProducts, {
+    await _models_1.FreezoneItemProduct.bulkCreate(updatedFreezoneItemProducts, {
       updateOnDuplicate: ['price', 'weight', 'quantity', 'adjustedWeight', 'adjustedQuantity'],
       transaction,
     });
-
     // Commit the transaction
     await transaction.commit();
-
     return { exists: true, freezoneItem: existingFreezoneItem };
   } catch (error) {
     await transaction.rollback();
     throw error; // Rethrow the error to be handled by your error handler
   }
 };
-
-export const freezoneServices = {
+exports.freezoneServices = {
   addFreezoneItem,
   getFreezoneItem,
   getFreezoneItems,
   updateFreezoneItem,
   updateOrderFreezoneItem,
 };
+//# sourceMappingURL=freezone.js.map
