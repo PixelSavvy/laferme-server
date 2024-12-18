@@ -5,6 +5,7 @@ import { orderProductSchema } from './order';
 const REQUIRED_ERROR_MSG = 'სავალდებულოა';
 
 const freezoneItemProductsSchema = orderProductSchema.extend({
+  freezoneItemId: z.number().nonnegative(),
   adjustedWeight: z.number().nonnegative(),
   adjustedQuantity: z.number().int().nonnegative(),
 });
@@ -15,6 +16,7 @@ const newFreezoneItemSchema = z.object({
       required_error: REQUIRED_ERROR_MSG,
     })
     .nonnegative(),
+  customerId: z.number().nonnegative(),
   status: z.enum(orderStatus, {
     required_error: REQUIRED_ERROR_MSG,
   }),
@@ -28,4 +30,9 @@ const freezoneItemSchema = newFreezoneItemSchema.extend({
   deletedAt: z.coerce.date().nullable().optional(),
 });
 
-export { freezoneItemProductsSchema, freezoneItemSchema, newFreezoneItemSchema };
+const updateFreezoneItemSchema = z.object({
+  id: z.number().nonnegative(),
+  products: z.array(freezoneItemProductsSchema),
+});
+
+export { freezoneItemProductsSchema, freezoneItemSchema, newFreezoneItemSchema, updateFreezoneItemSchema };
