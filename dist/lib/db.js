@@ -15,7 +15,7 @@ const connectDB = async () => {
         await sequelize.sync({
             alter: (0, _helpers_1.getEnvVar)('NODE_ENV') === 'development',
             force: false,
-            match: /_dev$/,
+            match: /_stage$/,
         });
         console.log('Database synchronized!');
     }
