@@ -20,6 +20,7 @@ const addFreezoneItem = async (req, res, orderId) => {
             id: orderId,
             orderId: orderId,
             status: order.status,
+            customerId: order.customerId,
         }, { transaction });
         // Fetch associated order products
         const orderProducts = await _models_1.OrderProduct.findAll({
@@ -125,7 +126,13 @@ const getFreezoneItems = async (req, res, id) => {
 const updateFreezoneItem = async (req, res, data) => {
     const transaction = await _lib_1.sequelize.transaction();
     try {
-        const existingFreezoneItem = await _models_1.FreezoneItem.findByPk(data.id, { transaction });
+        // Fetch the existing freezone item
+        const existingFreezoneItem = await _models_1.FreezoneItem.findOne({
+            where: { id: data.id, orderId: data.id },
+            attributes: ['id'],
+            transaction,
+        });
+        // If the freezone item does not exist, return an error
         if (!existingFreezoneItem) {
             await transaction.rollback();
             return {
@@ -133,30 +140,20 @@ const updateFreezoneItem = async (req, res, data) => {
                 freezoneItem: existingFreezoneItem,
             };
         }
-        const { products, ...freezoneItemData } = data;
-        // Update the order
-        const updatedFreezoneItem = await existingFreezoneItem.update(freezoneItemData, { transaction });
         // Rebuild the `FreezoneItemProduct` associations
         const freezoneItemProducts = data.products.map((product) => ({
-            freezoneItemId: updatedFreezoneItem.id,
-            productId: product.productId,
-            price: product.price,
-            weight: product.weight,
-            quantity: product.quantity,
-            adjustedWeight: product.adjustedWeight,
-            adjustedQuantity: product.adjustedQuantity,
+            ...product,
         }));
         // Replace existing associations with the new ones
-        await _models_1.FreezoneItemProduct.destroy({
-            where: { freezoneItemId: updatedFreezoneItem.id },
+        await _models_1.FreezoneItemProduct.bulkCreate(freezoneItemProducts, {
             transaction,
+            updateOnDuplicate: ['adjustedWeight', 'adjustedQuantity'],
         });
-        await _models_1.FreezoneItemProduct.bulkCreate(freezoneItemProducts, { transaction });
         // Commit the transaction
         await transaction.commit();
         return {
             exists: true,
-            order: updatedFreezoneItem,
+            freezoneItem: existingFreezoneItem,
         };
     }
     catch (error) {
@@ -165,54 +162,113 @@ const updateFreezoneItem = async (req, res, data) => {
         throw error;
     }
 };
-const updateOrderFreezoneItem = async (data) => {
+const updateFreezoneItemOnOrderUpdate = async (req, res, data) => {
     const transaction = await _lib_1.sequelize.transaction();
     try {
-        const existingFreezoneItem = await _models_1.FreezoneItem.findOne({
-            where: { orderId: data.id },
-            transaction,
-        });
-        if (!existingFreezoneItem) {
-            return { exists: false, freezoneItem: null };
-        }
-        const products = data.products.map((product) => ({
-            freezoneItemId: existingFreezoneItem.id,
-            productId: product.productId,
-            price: product.price,
-            weight: product.weight,
-            quantity: product.quantity,
-        }));
-        const existingFreezoneItemProducts = await _models_1.FreezoneItemProduct.findAll({
+        const { products: orderProducts, id: orderId } = data;
+        // Fetch all the products associated with the current freezoneItemId (orderId)
+        const existingProducts = await _models_1.FreezoneItemProduct.findAll({
             where: {
-                freezoneItemId: existingFreezoneItem.id,
+                freezoneItemId: orderId,
             },
             transaction,
         });
-        const updatedFreezoneItemProducts = existingFreezoneItemProducts.map((existingProduct) => {
-            const product = products.find((p) => p.productId === existingProduct.productId);
-            if (!product)
-                return existingProduct;
-            return {
-                freezoneItemId: data.id,
-                productId: product.productId,
-                price: product.price,
-                weight: product.weight,
-                quantity: product.quantity,
-                adjustedWeight: existingProduct.adjustedWeight,
-                adjustedQuantity: existingProduct.adjustedQuantity,
-            };
+        // Prepare the updated products list, removed products, and new products
+        const updatedProducts = [];
+        const removedProducts = [];
+        const newProducts = [];
+        for (const product of existingProducts) {
+            const updatedProduct = orderProducts.find((p) => p.productId === product.productId);
+            // If the product is updated, check if there's any difference
+            if (updatedProduct) {
+                const isUpdated = product.quantity !== updatedProduct.quantity ||
+                    product.weight !== updatedProduct.weight ||
+                    product.price !== updatedProduct.price;
+                if (isUpdated) {
+                    updatedProducts.push({
+                        ...product.get(), // Get the original data values
+                        ...updatedProduct, // Merge updated data
+                    });
+                }
+            }
+            else {
+                // If the product is not in orderProducts, mark it for removal
+                removedProducts.push(product);
+            }
+        }
+        // Add new products that do not exist in existing products
+        for (const product of orderProducts) {
+            const existingProduct = existingProducts.find((p) => p.productId === product.productId);
+            if (!existingProduct) {
+                newProducts.push({
+                    freezoneItemId: orderId,
+                    adjustedQuantity: 0, // Set adjustedQuantity to 0 for new products
+                    adjustedWeight: 0, // Set adjustedWeight to 0 for new products
+                    ...product, // Merge product data
+                });
+            }
+        }
+        // Delete removed products from FreezoneItemProduct
+        await Promise.all(removedProducts.map((product) => {
+            return product.destroy({ transaction });
+        }));
+        // Insert or update existing products
+        await _models_1.FreezoneItemProduct.bulkCreate(updatedProducts, {
+            updateOnDuplicate: ['price', 'quantity', 'weight'], // Fields to be updated if the product already exists
+            transaction,
         });
-        await _models_1.FreezoneItemProduct.bulkCreate(updatedFreezoneItemProducts, {
-            updateOnDuplicate: ['price', 'weight', 'quantity', 'adjustedWeight', 'adjustedQuantity'],
+        // Insert new products that were added
+        if (newProducts.length > 0) {
+            await _models_1.FreezoneItemProduct.bulkCreate(newProducts, {
+                transaction,
+            });
+        }
+        // Commit the transaction
+        await transaction.commit();
+        return {
+            success: true,
+        };
+    }
+    catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+};
+const deleteFreezoneItem = async (req, res, id) => {
+    const transaction = await _lib_1.sequelize.transaction();
+    try {
+        // Fetch the existing freezone item
+        const existingFreezoneItem = await _models_1.FreezoneItem.findOne({
+            where: { id },
+            transaction,
+        });
+        // If the freezone item does not exist, return an error
+        if (!existingFreezoneItem) {
+            await transaction.rollback();
+            return {
+                exists: false,
+                freezoneItem: existingFreezoneItem,
+            };
+        }
+        // Delete the freezone item
+        await existingFreezoneItem.destroy({ transaction });
+        // Delete all associated products
+        await _models_1.FreezoneItemProduct.destroy({
+            where: {
+                freezoneItemId: id,
+            },
             transaction,
         });
         // Commit the transaction
         await transaction.commit();
-        return { exists: true, freezoneItem: existingFreezoneItem };
+        return {
+            exists: true,
+            freezoneItem: existingFreezoneItem,
+        };
     }
     catch (error) {
         await transaction.rollback();
-        throw error; // Rethrow the error to be handled by your error handler
+        throw error;
     }
 };
 exports.freezoneServices = {
@@ -220,6 +276,7 @@ exports.freezoneServices = {
     getFreezoneItem,
     getFreezoneItems,
     updateFreezoneItem,
-    updateOrderFreezoneItem,
+    updateFreezoneItemOnOrderUpdate,
+    deleteFreezoneItem,
 };
 //# sourceMappingURL=freezone.js.map

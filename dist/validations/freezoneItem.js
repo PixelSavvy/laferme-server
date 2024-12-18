@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newFreezoneItemSchema = exports.freezoneItemSchema = exports.freezoneItemProductsSchema = void 0;
+exports.updateFreezoneItemSchema = exports.newFreezoneItemSchema = exports.freezoneItemSchema = exports.freezoneItemProductsSchema = void 0;
 const _config_1 = require("@config");
 const zod_1 = require("zod");
 const order_1 = require("./order");
 const REQUIRED_ERROR_MSG = 'სავალდებულოა';
 const freezoneItemProductsSchema = order_1.orderProductSchema.extend({
+    freezoneItemId: zod_1.z.number().nonnegative(),
     adjustedWeight: zod_1.z.number().nonnegative(),
     adjustedQuantity: zod_1.z.number().int().nonnegative(),
 });
@@ -16,6 +17,7 @@ const newFreezoneItemSchema = zod_1.z.object({
         required_error: REQUIRED_ERROR_MSG,
     })
         .nonnegative(),
+    customerId: zod_1.z.number().nonnegative(),
     status: zod_1.z.enum(_config_1.orderStatus, {
         required_error: REQUIRED_ERROR_MSG,
     }),
@@ -29,4 +31,9 @@ const freezoneItemSchema = newFreezoneItemSchema.extend({
     deletedAt: zod_1.z.coerce.date().nullable().optional(),
 });
 exports.freezoneItemSchema = freezoneItemSchema;
+const updateFreezoneItemSchema = zod_1.z.object({
+    id: zod_1.z.number().nonnegative(),
+    products: zod_1.z.array(freezoneItemProductsSchema),
+});
+exports.updateFreezoneItemSchema = updateFreezoneItemSchema;
 //# sourceMappingURL=freezoneItem.js.map

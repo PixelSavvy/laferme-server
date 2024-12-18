@@ -21,6 +21,14 @@ const FreezoneItem = _lib_1.sequelize.define('FreezoneItem', {
             key: 'id',
         },
     },
+    customerId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Customers',
+            key: 'id',
+        },
+    },
     status: {
         type: sequelize_1.DataTypes.ENUM(..._config_1.orderStatus),
         allowNull: false,

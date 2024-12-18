@@ -6,21 +6,27 @@ const _lib_1 = require("@lib");
 const _services_1 = require("@services");
 const _validations_1 = require("@validations");
 const addOrder = async (req, res) => {
+    const transaction = await _lib_1.sequelize.transaction();
     const data = req.body;
     const parsedData = _validations_1.newOrderSchema.safeParse(data);
     if (!parsedData.success)
         return (0, _helpers_1.sendResponse)(res, 400, 'Validation error', parsedData.error.format());
     try {
         const orderId = await _services_1.orderServices.addOrder(req, res, parsedData.data);
-        if (!orderId)
-            return (0, _helpers_1.sendResponse)(res, 404, 'შეცდომა შეკვეთის დამატებისას');
+        if (!orderId) {
+            await transaction.rollback();
+            return (0, _helpers_1.sendResponse)(res, 500, 'შეცდომა შეკვეთის შექმნისას');
+        }
         const freezoneItemId = await _services_1.freezoneServices.addFreezoneItem(req, res, orderId);
-        if (!freezoneItemId)
-            return;
-        // const distributionItem = await distributionServices.addDistributionItem(req, res, freezoneItemId);
-        return (0, _helpers_1.sendResponse)(res, 201, `შეკვეთა წარმატებით დაემატა; შეკვეთა წარმატებით დაემატა თავისუფალ ზონაში; შეკვეთა წარმატებით დაემატა დისტრიბუციაში`, freezoneItemId);
+        if (!freezoneItemId) {
+            await transaction.rollback();
+            return (0, _helpers_1.sendResponse)(res, 500, 'შეცდომა შეკვეთის თავისუფალ ზონაში დამატებისას');
+        }
+        await transaction.commit();
+        return (0, _helpers_1.sendResponse)(res, 201, `შეკვეთა წარმატებით დაემატა`, freezoneItemId);
     }
     catch (error) {
+        await transaction.rollback();
         console.error('Error adding an order:', error);
         return (0, _helpers_1.sendResponse)(res, 500, 'შეცდომა შეკვეთის შექმნისას', error);
     }
@@ -54,6 +60,7 @@ const deleteOrder = async (req, res) => {
     const { id } = req.params;
     try {
         await _services_1.orderServices.deleteOrder(req, res, Number(id));
+        await _services_1.freezoneServices.deleteFreezoneItem(req, res, Number(id));
     }
     catch (error) {
         console.error('Error deleting an order:', error);
@@ -63,7 +70,6 @@ const deleteOrder = async (req, res) => {
 const updateOrder = async (req, res) => {
     const data = req.body;
     const transaction = await _lib_1.sequelize.transaction();
-    console.log(data);
     const parsedData = _validations_1.updateOrderSchema.safeParse(data);
     if (!parsedData.success)
         return (0, _helpers_1.sendResponse)(res, 400, 'Validation error', parsedData.error.format());
@@ -73,8 +79,13 @@ const updateOrder = async (req, res) => {
             await transaction.rollback();
             return (0, _helpers_1.sendResponse)(res, 404, 'შეკვეთა ვერ მოიძებნა', updatedOrder.order);
         }
+        const updatedFreezoneItem = await _services_1.freezoneServices.updateFreezoneItemOnOrderUpdate(req, res, parsedData.data);
+        if (!updatedFreezoneItem.success) {
+            await transaction.rollback();
+            return (0, _helpers_1.sendResponse)(res, 500, 'შეცდომა შეკვეთის თავისუფალ ზონის განახლებისას');
+        }
         await transaction.commit();
-        return (0, _helpers_1.sendResponse)(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedOrder.order);
+        return (0, _helpers_1.sendResponse)(res, 200, 'შეკვეთა წარმატებით განახლდა');
     }
     catch (error) {
         await transaction.rollback();

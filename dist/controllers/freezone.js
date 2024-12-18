@@ -30,14 +30,14 @@ const getFreezoneItems = async (req, res) => {
 };
 const updateFreezoneItem = async (req, res) => {
     const data = req.body;
-    const parsedData = _validations_1.freezoneItemSchema.safeParse(data);
+    const parsedData = _validations_1.updateFreezoneItemSchema.safeParse(data);
     if (!parsedData.success)
         return (0, _helpers_1.sendResponse)(res, 400, 'Validation error', parsedData.error.format());
     try {
-        const updatedOrder = await _services_1.freezoneServices.updateFreezoneItem(req, res, parsedData.data);
-        if (!updatedOrder.exists)
-            return (0, _helpers_1.sendResponse)(res, 202, 'შეკვეთა ვერ მოიძებნა', updatedOrder.freezoneItem);
-        return (0, _helpers_1.sendResponse)(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedOrder.freezoneItem);
+        const updatedFreezoneItem = await _services_1.freezoneServices.updateFreezoneItem(req, res, parsedData.data);
+        if (!updatedFreezoneItem.exists)
+            return (0, _helpers_1.sendResponse)(res, 202, 'შეკვეთა ვერ მოიძებნა', updatedFreezoneItem.freezoneItem);
+        return (0, _helpers_1.sendResponse)(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedFreezoneItem.freezoneItem);
     }
     catch (error) {
         console.error('Error updating an order:', error);

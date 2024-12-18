@@ -132,31 +132,55 @@ const deleteOrder = async (req, res, id) => {
 const updateOrder = async (req, res, data) => {
     const transaction = await _lib_1.sequelize.transaction();
     try {
+        // Fetch the existing order from DB
         const existingOrder = await _models_1.Order.findByPk(data.id, { transaction });
+        // Handle the case where order does not exist
         if (!existingOrder) {
             await transaction.rollback();
             return {
                 exists: false,
-                order: null,
+                message: 'Order not found',
             };
         }
         const { products, ...orderData } = data;
-        // Update the order
+        // Update the order data (excluding products)
         const updatedOrder = await existingOrder.update(orderData, { transaction });
-        // Rebuild the `OrderProduct` associations
-        const orderProducts = data.products.map((product) => ({
-            orderId: updatedOrder.id,
-            productId: product.productId,
-            price: product.price,
-            weight: product.weight,
-            quantity: product.quantity,
-        }));
-        // Replace existing associations with the new ones
-        await _models_1.OrderProduct.destroy({
-            where: { orderId: updatedOrder.id },
-            transaction,
-        });
-        await _models_1.OrderProduct.bulkCreate(orderProducts, { transaction });
+        // Check for product updates (add, update, delete)
+        if (products && Array.isArray(products)) {
+            // Find existing products associated with the order
+            const existingOrderProducts = await _models_1.OrderProduct.findAll({
+                where: { orderId: updatedOrder.id },
+                transaction,
+            });
+            const existingProductIds = existingOrderProducts.map((p) => p.productId);
+            const newProductIds = products.map((p) => p.productId);
+            // Identify products to be added
+            const productsToAdd = products.filter((p) => !existingProductIds.includes(p.productId));
+            // Identify products to be updated (those that already exist)
+            const productsToUpdate = products.filter((p) => existingProductIds.includes(p.productId));
+            // Identify products to be removed (those that no longer exist in the new list)
+            const productsToRemove = existingOrderProducts.filter((p) => !newProductIds.includes(p.productId));
+            // 1. Remove old products no longer in the order
+            await _models_1.OrderProduct.destroy({
+                where: {
+                    productId: productsToRemove.map((product) => product.productId),
+                },
+                transaction,
+            });
+            // 2. Add new products
+            const orderProductsToAdd = productsToAdd.map((product) => ({
+                orderId: updatedOrder.id,
+                ...product,
+            }));
+            await _models_1.OrderProduct.bulkCreate(orderProductsToAdd, { transaction });
+            // 3. Update existing products
+            for (const product of productsToUpdate) {
+                const orderProduct = existingOrderProducts.find((p) => p.productId === product.productId);
+                if (orderProduct) {
+                    await orderProduct.update(product, { transaction });
+                }
+            }
+        }
         // Commit the transaction
         await transaction.commit();
         return {
