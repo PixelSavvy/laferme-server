@@ -1,14 +1,10 @@
-import 'dotenv/config';
-
 import { dbConfig } from '@config';
 import { getEnvVar } from '@helpers';
+import 'dotenv/config';
+
 import { Sequelize } from 'sequelize';
 
-// Determine the environment
-const environment = getEnvVar('NODE_ENV', 'development');
-const config = dbConfig[environment];
-
-const sequelize = new Sequelize(config);
+const sequelize = new Sequelize(getEnvVar('DB_URL'), dbConfig);
 
 const connectDB = async () => {
   try {
@@ -16,7 +12,12 @@ const connectDB = async () => {
     console.log('Database connected!');
     await sequelize.query(`CREATE SCHEMA IF NOT EXISTS operations`);
     await sequelize.sync({
+<<<<<<< HEAD
+      alter: getEnvVar('NODE_ENV') === 'development',
+      force: false,
+=======
       alter: environment === 'development',
+>>>>>>> ef861539364d9e7312cd78a8915e4331e30c48a1
       match: /_dev$/,
     });
     console.log('Database synchronized!');
