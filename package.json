@@ -4,8 +4,7 @@
     "dev": "NODE_ENV=development ts-node-dev -r tsconfig-paths/register --respawn --transpile-only ./src/server.ts",
     "prod": "NODE_ENV=production npm run build && node -r ./prod-paths.js ./dist/server.js",
     "build": "NODE_ENV=production tsc -p .",
-    "start": "node -r tsconfig-paths/register ./dist/server.js",
-    "prepare": "husky install"
+    "start": "node -r tsconfig-paths/register ./dist/server.js"
   },
   "main": "dist/server.js",
   "dependencies": {
