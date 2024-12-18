@@ -1,13 +1,12 @@
 import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { z } from 'zod';
 
-import { distributionStatus } from '@config';
 import { sequelize } from '@lib';
 import { distributionItemSchema as schema } from '@validations';
 import { FreezoneItemInstance } from './freezoneItem';
+import { distributionStatus } from '@config';
 
 const distributionItemSchema = schema.omit({ products: true, createdAt: true, updatedAt: true, deletedAt: true });
-const DISTRIBUTION_ITEM_STATUS = Object.values(distributionStatus);
 
 interface DistributionItemSchema
   extends z.infer<typeof distributionItemSchema>,
@@ -33,9 +32,9 @@ const DistributionItem = sequelize.define<DistributionItemSchema>(
       },
     },
     status: {
-      type: DataTypes.ENUM(...DISTRIBUTION_ITEM_STATUS),
+      type: DataTypes.ENUM(...distributionStatus),
       allowNull: false,
-      defaultValue: DISTRIBUTION_ITEM_STATUS[0],
+      defaultValue: distributionStatus[0],
     },
   },
   {

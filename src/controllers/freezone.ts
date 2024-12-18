@@ -21,7 +21,7 @@ const getFreezoneItems = async (req: Request, res: Response) => {
     const freezoneItems = await freezoneServices.getFreezoneItems(req, res, Number(id));
 
     if (!freezoneItems.exists)
-      return sendResponse(res, 404, 'შეკვეთები თავისუფალ ზონაში ვერ მოიძებნა', freezoneItems.freezoneItems);
+      return sendResponse(res, 202, 'შეკვეთები თავისუფალ ზონაში ვერ მოიძებნა', freezoneItems.freezoneItems);
 
     return sendResponse(res, 200, 'შეკვეთები თავისუფალ ზონაში წარმატებით მოიძებნა!', freezoneItems.freezoneItems);
   } catch (error) {
@@ -40,7 +40,7 @@ const updateFreezoneItem = async (req: Request, res: Response) => {
   try {
     const updatedOrder = await freezoneServices.updateFreezoneItem(req, res, parsedData.data);
 
-    if (!updatedOrder.exists) return sendResponse(res, 404, 'შეკვეთა ვერ მოიძებნა', updatedOrder.freezoneItem);
+    if (!updatedOrder.exists) return sendResponse(res, 202, 'შეკვეთა ვერ მოიძებნა', updatedOrder.freezoneItem);
 
     return sendResponse(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedOrder.freezoneItem);
   } catch (error) {

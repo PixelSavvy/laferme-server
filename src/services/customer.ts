@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { Customer, Product, ProductInstance } from '@models';
 import { customerSchema, newCustomerSchema } from '@validations';
 
-import { paymentOptions, priceIndex } from '@config';
 import { sendResponse } from '@helpers';
 import { sequelize } from '@lib';
 import { Op } from 'sequelize';
@@ -22,7 +21,10 @@ const addCustomer = async (req: Request, res: Response, data: z.infer<typeof new
 
     if (existingCustomer) {
       await transaction.rollback();
-      return sendResponse(res, 409, 'მომხმარებელი მსგავსი ელ.ფოსტით უკვე არსებობს');
+      return {
+        success: true,
+        customer: existingCustomer,
+      };
     }
 
     // If the products array is not empty, check if the products exist
@@ -38,25 +40,20 @@ const addCustomer = async (req: Request, res: Response, data: z.infer<typeof new
         },
         transaction,
       });
-      if (existingProducts.length !== data.products.length) {
-        await transaction.rollback();
-        return sendResponse(res, 404, 'პროდუქტი ვერ მოიძებნა');
-      }
     }
 
     // If the customer with the same email does not exist and the products exist
-    const newCustomer = await Customer.create({
-      ...data,
-      priceIndex: priceIndex[Number(data.priceIndex)],
-      paymentOption: paymentOptions[Number(data.paymentOption)],
-    });
+    const newCustomer = await Customer.create(data);
 
     // Associate customer products with the newly create customer
     await newCustomer.setProducts(existingProducts);
 
     await transaction.commit();
 
-    return newCustomer;
+    return {
+      exists: false,
+      customer: newCustomer,
+    };
   } catch (error) {
     await transaction.rollback();
     console.log('Failed to add a customer', error);

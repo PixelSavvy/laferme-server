@@ -7,9 +7,6 @@ import { paymentOptions, priceIndex } from '@config';
 import { customerSchema as schema } from '@validations';
 import { ProductInstance } from './product';
 
-const PAYMENT_OPTIONS = Object.values(paymentOptions);
-const PRICE_INDEXES = Object.values(priceIndex);
-
 const customerSchema = schema.omit({
   createdAt: true,
   updatedAt: true,
@@ -40,11 +37,11 @@ const Customer = sequelize.define<CustomerInstance>(
       allowNull: false,
     },
     priceIndex: {
-      type: DataTypes.ENUM(...PRICE_INDEXES),
+      type: DataTypes.ENUM(...priceIndex),
       allowNull: false,
     },
     paymentOption: {
-      type: DataTypes.ENUM(...PAYMENT_OPTIONS),
+      type: DataTypes.ENUM(...paymentOptions),
       allowNull: false,
     },
     phone: {

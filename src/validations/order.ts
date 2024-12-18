@@ -2,7 +2,6 @@ import { orderStatus } from '@config';
 import { z } from 'zod';
 
 const REQUIRED_ERROR_MSG = 'სავალდებულოა';
-const status = Object.keys(orderStatus) as [string, ...string[]];
 
 const orderProductSchema = z.object({
   productId: z
@@ -30,7 +29,7 @@ const orderProductSchema = z.object({
 
 const newOrderSchema = z.object({
   customerId: z.number().nonnegative(),
-  status: z.enum(status, {
+  status: z.enum(orderStatus, {
     required_error: REQUIRED_ERROR_MSG,
   }),
   products: z.array(orderProductSchema),
@@ -43,4 +42,9 @@ const orderSchema = newOrderSchema.extend({
   deletedAt: z.coerce.date().nullable().optional(),
 });
 
-export { newOrderSchema, orderProductSchema, orderSchema };
+const updateOrderSchema = z.object({
+  id: z.number().nonnegative(),
+  products: z.array(orderProductSchema),
+});
+
+export { newOrderSchema, orderProductSchema, orderSchema, updateOrderSchema };

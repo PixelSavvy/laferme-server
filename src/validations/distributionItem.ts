@@ -1,9 +1,8 @@
-import { distributionStatus } from '@config';
 import { z } from 'zod';
 import { freezoneItemProductsSchema } from './freezoneItem';
+import { distributionStatus } from '@config';
 
 const REQUIRED_ERROR_MSG = 'სავალდებულოა';
-const status = Object.values(distributionStatus) as [string, ...string[]];
 
 const distributionItemProductsSchema = freezoneItemProductsSchema
   .extend({
@@ -21,7 +20,7 @@ const newDistributionItemSchema = z.object({
       required_error: REQUIRED_ERROR_MSG,
     })
     .nonnegative(),
-  status: z.enum(status, {
+  status: z.enum(distributionStatus, {
     required_error: REQUIRED_ERROR_MSG,
   }),
   products: z.array(distributionItemProductsSchema),

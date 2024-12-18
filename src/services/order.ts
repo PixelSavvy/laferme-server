@@ -3,57 +3,30 @@ import { z } from 'zod';
 
 import { sequelize } from '@lib';
 
-import { orderStatus } from '@config';
 import { sendResponse } from '@helpers';
-import { Customer, Order, OrderProduct, Product, ProductInstance } from '@models';
-import { newOrderSchema, orderSchema } from '@validations';
-import { Op } from 'sequelize';
+import { Customer, Order, OrderProduct, Product } from '@models';
+import { newOrderSchema, updateOrderSchema } from '@validations';
 
 const addOrder = async (req: Request, res: Response, data: z.infer<typeof newOrderSchema>) => {
   const transaction = await sequelize.transaction();
   try {
-    let existingProducts: ProductInstance[] = [];
+    const existingCustomer = await Customer.findByPk(data.customerId, { transaction });
 
-    if (data.products && data.products.length > 0) {
-      const productIds = data.products.map((product) => product.productId);
-
-      existingProducts = await Product.findAll({
-        where: {
-          id: {
-            [Op.in]: productIds,
-          },
-        },
-        transaction,
-      });
-
-      if (existingProducts.length !== data.products.length) {
-        await transaction.rollback();
-        return;
-      }
+    if (!existingCustomer) {
+      await transaction.rollback();
+      return;
     }
 
-    const { products, ...orderData } = data;
+    const { products, ...order } = data;
 
-    const newOrder = await Order.create(
-      {
-        ...orderData,
-        status: orderStatus[Number(data.status)],
-      },
-      { transaction }
-    );
+    const newOrder = await Order.create(order, { transaction });
 
     const orderProducts = data.products.map((product) => ({
       orderId: newOrder.id,
       ...product,
     }));
 
-    const createdOrderProducts = await OrderProduct.bulkCreate(orderProducts, { transaction });
-
-    if (createdOrderProducts.length === 0) {
-      await transaction.rollback();
-
-      return;
-    }
+    await OrderProduct.bulkCreate(orderProducts, { transaction });
 
     await transaction.commit();
 
@@ -136,7 +109,7 @@ const getOrders = async (req: Request, res: Response) => {
     if (existingOrders.length === 0)
       return {
         exists: false,
-        orders: null,
+        orders: existingOrders,
       };
 
     return {
@@ -175,7 +148,7 @@ const deleteOrder = async (req: Request, res: Response, id: number) => {
   }
 };
 
-const updateOrder = async (req: Request, res: Response, data: z.infer<typeof orderSchema>) => {
+const updateOrder = async (req: Request, res: Response, data: z.infer<typeof updateOrderSchema>) => {
   const transaction = await sequelize.transaction();
 
   try {

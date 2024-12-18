@@ -1,7 +1,7 @@
 import { sendResponse } from '@helpers';
 import { sequelize } from '@lib';
 import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from '@models';
-import { freezoneItemSchema } from '@validations';
+import { freezoneItemSchema, orderSchema } from '@validations';
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -20,6 +20,7 @@ const addFreezoneItem = async (req: Request, res: Response, orderId: number) => 
     // Create a freezoneItem
     const newFreezoneItem = await FreezoneItem.create(
       {
+        id: orderId,
         orderId: orderId,
         status: order.status,
       },
@@ -149,7 +150,7 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
       await transaction.rollback();
       return {
         exists: false,
-        freezoneItem: null,
+        freezoneItem: existingFreezoneItem,
       };
     }
 
@@ -189,9 +190,69 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
   }
 };
 
+const updateOrderFreezoneItem = async (data: z.infer<typeof orderSchema>) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const existingFreezoneItem = await FreezoneItem.findOne({
+      where: { orderId: data.id },
+      transaction,
+    });
+
+    if (!existingFreezoneItem) {
+      return { exists: false, freezoneItem: null };
+    }
+
+    const products = data.products.map((product) => ({
+      freezoneItemId: existingFreezoneItem.id,
+      productId: product.productId,
+      price: product.price,
+      weight: product.weight,
+      quantity: product.quantity,
+    }));
+
+    const existingFreezoneItemProducts = await FreezoneItemProduct.findAll({
+      where: {
+        freezoneItemId: existingFreezoneItem.id,
+      },
+      transaction,
+    });
+
+    const updatedFreezoneItemProducts = existingFreezoneItemProducts.map((existingProduct) => {
+      const product = products.find((p) => p.productId === existingProduct.productId);
+
+      if (!product) return existingProduct;
+
+      return {
+        freezoneItemId: data.id,
+        productId: product.productId,
+        price: product.price,
+        weight: product.weight,
+        quantity: product.quantity,
+        adjustedWeight: existingProduct.adjustedWeight,
+        adjustedQuantity: existingProduct.adjustedQuantity,
+      };
+    });
+
+    await FreezoneItemProduct.bulkCreate(updatedFreezoneItemProducts, {
+      updateOnDuplicate: ['price', 'weight', 'quantity', 'adjustedWeight', 'adjustedQuantity'],
+      transaction,
+    });
+
+    // Commit the transaction
+    await transaction.commit();
+
+    return { exists: true, freezoneItem: existingFreezoneItem };
+  } catch (error) {
+    await transaction.rollback();
+    throw error; // Rethrow the error to be handled by your error handler
+  }
+};
+
 export const freezoneServices = {
   addFreezoneItem,
   getFreezoneItem,
   getFreezoneItems,
   updateFreezoneItem,
+  updateOrderFreezoneItem,
 };

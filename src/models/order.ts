@@ -8,7 +8,6 @@ import { CustomerInstance } from './customer';
 import { OrderProductInstance } from './orderProduct';
 
 const orderSchema = schema.omit({ products: true, createdAt: true, updatedAt: true, deletedAt: true });
-const ORDER_STATUS = Object.values(orderStatus);
 
 interface OrderInstance
   extends z.infer<typeof orderSchema>,
@@ -37,9 +36,9 @@ const Order = sequelize.define<OrderInstance>(
       },
     },
     status: {
-      type: DataTypes.ENUM(...ORDER_STATUS),
+      type: DataTypes.ENUM(...orderStatus),
       allowNull: false,
-      defaultValue: ORDER_STATUS[0],
+      defaultValue: orderStatus[0],
     },
   },
   {

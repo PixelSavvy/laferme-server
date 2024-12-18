@@ -19,7 +19,8 @@ const getDistributionItems = async (req: Request, res: Response) => {
   try {
     const distributionItem = await distributionServices.getDistributionItems(req, res);
 
-    if (!distributionItem.exists) return sendResponse(res, 404, 'მსგავსი დისტრიბუცია ვერ მოიძებნა', distributionItem.data);
+    if (!distributionItem.exists)
+      return sendResponse(res, 202, 'შეკვეთები დისტრიბუციაში ვერ მოიძებნა', distributionItem.data);
 
     return sendResponse(res, 200, 'დისტრიბუციები წარმატებით მოიძებნა!', distributionItem.data);
   } catch (error) {
@@ -38,7 +39,7 @@ const updateDistributionItem = async (req: Request, res: Response) => {
   try {
     const updatedOrder = await distributionServices.updateDistributionItem(req, res, parsedData.data);
 
-    if (!updatedOrder.exists) return sendResponse(res, 404, 'შეკვეთა ვერ მოიძებნა', updatedOrder.data);
+    if (!updatedOrder.exists) return sendResponse(res, 202, 'შეკვეთა ვერ მოიძებნა', updatedOrder.data);
 
     return sendResponse(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedOrder.data);
   } catch (error) {

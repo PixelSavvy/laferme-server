@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { orderProductSchema } from './order';
 
 const REQUIRED_ERROR_MSG = 'სავალდებულოა';
-const status = Object.values(orderStatus) as [string, ...string[]];
 
 const freezoneItemProductsSchema = orderProductSchema.extend({
   adjustedWeight: z.number().nonnegative(),
@@ -16,7 +15,7 @@ const newFreezoneItemSchema = z.object({
       required_error: REQUIRED_ERROR_MSG,
     })
     .nonnegative(),
-  status: z.enum(status, {
+  status: z.enum(orderStatus, {
     required_error: REQUIRED_ERROR_MSG,
   }),
   products: z.array(freezoneItemProductsSchema),

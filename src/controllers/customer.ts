@@ -40,7 +40,8 @@ const addCustomer = async (req: Request, res: Response) => {
     const newCustomer = await customerServices.addCustomer(req, res, parsedData.data);
 
     // wrong input
-    if (!newCustomer) return sendResponse(res, 422, 'სარეალიზაციო პუნქტი ვერ დაემატა');
+    if (newCustomer.exists)
+      return sendResponse(res, 400, 'სარეალიზაციო პუნქტი მსგავსი ელ.ფოსტით უკვე არსებობს', newCustomer.customer);
 
     return sendResponse(res, 201, 'სარეალიზაციო პუნქტი წარმატებით დაემატა', newCustomer);
   } catch (error) {
