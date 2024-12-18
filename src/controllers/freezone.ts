@@ -1,6 +1,6 @@
 import { sendResponse } from '@helpers';
 import { freezoneServices } from '@services';
-import { freezoneItemSchema } from '@validations';
+import { updateFreezoneItemSchema } from '@validations';
 import { Request, Response } from 'express';
 
 const getFreezoneItem = async (req: Request, res: Response) => {
@@ -33,16 +33,17 @@ const getFreezoneItems = async (req: Request, res: Response) => {
 const updateFreezoneItem = async (req: Request, res: Response) => {
   const data = req.body;
 
-  const parsedData = freezoneItemSchema.safeParse(data);
+  const parsedData = updateFreezoneItemSchema.safeParse(data);
 
   if (!parsedData.success) return sendResponse(res, 400, 'Validation error', parsedData.error.format());
 
   try {
-    const updatedOrder = await freezoneServices.updateFreezoneItem(req, res, parsedData.data);
+    const updatedFreezoneItem = await freezoneServices.updateFreezoneItem(req, res, parsedData.data);
 
-    if (!updatedOrder.exists) return sendResponse(res, 202, 'შეკვეთა ვერ მოიძებნა', updatedOrder.freezoneItem);
+    if (!updatedFreezoneItem.exists)
+      return sendResponse(res, 202, 'შეკვეთა ვერ მოიძებნა', updatedFreezoneItem.freezoneItem);
 
-    return sendResponse(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedOrder.freezoneItem);
+    return sendResponse(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedFreezoneItem.freezoneItem);
   } catch (error) {
     console.error('Error updating an order:', error);
     return sendResponse(res, 500, 'შეცდომა შეკვეთის განახლებისას', error);

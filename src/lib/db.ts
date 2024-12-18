@@ -12,8 +12,12 @@ const connectDB = async () => {
     console.log('Database connected!');
     await sequelize.query(`CREATE SCHEMA IF NOT EXISTS operations`);
     await sequelize.sync({
+<<<<<<< HEAD
       alter: getEnvVar('NODE_ENV') === 'development',
       force: false,
+=======
+      alter: environment === 'development',
+>>>>>>> ef861539364d9e7312cd78a8915e4331e30c48a1
       match: /_dev$/,
     });
     console.log('Database synchronized!');

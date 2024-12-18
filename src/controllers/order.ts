@@ -5,6 +5,7 @@ import { newOrderSchema, updateOrderSchema } from '@validations';
 import { Request, Response } from 'express';
 
 const addOrder = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction();
   const data = req.body;
 
   const parsedData = newOrderSchema.safeParse(data);
@@ -14,21 +15,23 @@ const addOrder = async (req: Request, res: Response) => {
   try {
     const orderId = await orderServices.addOrder(req, res, parsedData.data);
 
-    if (!orderId) return sendResponse(res, 404, 'შეცდომა შეკვეთის დამატებისას');
+    if (!orderId) {
+      await transaction.rollback();
+      return sendResponse(res, 500, 'შეცდომა შეკვეთის შექმნისას');
+    }
 
     const freezoneItemId = await freezoneServices.addFreezoneItem(req, res, orderId);
 
-    if (!freezoneItemId) return;
+    if (!freezoneItemId) {
+      await transaction.rollback();
+      return sendResponse(res, 500, 'შეცდომა შეკვეთის თავისუფალ ზონაში დამატებისას');
+    }
 
-    // const distributionItem = await distributionServices.addDistributionItem(req, res, freezoneItemId);
+    await transaction.commit();
 
-    return sendResponse(
-      res,
-      201,
-      `შეკვეთა წარმატებით დაემატა; შეკვეთა წარმატებით დაემატა თავისუფალ ზონაში; შეკვეთა წარმატებით დაემატა დისტრიბუციაში`,
-      freezoneItemId
-    );
+    return sendResponse(res, 201, `შეკვეთა წარმატებით დაემატა`, freezoneItemId);
   } catch (error) {
+    await transaction.rollback();
     console.error('Error adding an order:', error);
     return sendResponse(res, 500, 'შეცდომა შეკვეთის შექმნისას', error);
   }
@@ -65,6 +68,7 @@ const deleteOrder = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await orderServices.deleteOrder(req, res, Number(id));
+    await freezoneServices.deleteFreezoneItem(req, res, Number(id));
   } catch (error) {
     console.error('Error deleting an order:', error);
     return sendResponse(res, 500, 'შეცდომა შეკვეთის წაშლისას', error);
@@ -74,8 +78,6 @@ const deleteOrder = async (req: Request, res: Response) => {
 const updateOrder = async (req: Request, res: Response) => {
   const data = req.body;
   const transaction = await sequelize.transaction();
-
-  console.log(data);
 
   const parsedData = updateOrderSchema.safeParse(data);
 
@@ -89,9 +91,16 @@ const updateOrder = async (req: Request, res: Response) => {
       return sendResponse(res, 404, 'შეკვეთა ვერ მოიძებნა', updatedOrder.order);
     }
 
+    const updatedFreezoneItem = await freezoneServices.updateFreezoneItemOnOrderUpdate(req, res, parsedData.data);
+
+    if (!updatedFreezoneItem.success) {
+      await transaction.rollback();
+      return sendResponse(res, 500, 'შეცდომა შეკვეთის თავისუფალ ზონის განახლებისას');
+    }
+
     await transaction.commit();
 
-    return sendResponse(res, 200, 'შეკვეთა წარმატებით განახლდა', updatedOrder.order);
+    return sendResponse(res, 200, 'შეკვეთა წარმატებით განახლდა');
   } catch (error) {
     await transaction.rollback();
     console.error('Error updating an order:', error);
