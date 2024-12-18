@@ -1,14 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sequelize = exports.connectDB = void 0;
-require("dotenv/config");
 const _config_1 = require("@config");
 const _helpers_1 = require("@helpers");
+require("dotenv/config");
 const sequelize_1 = require("sequelize");
-// Determine the environment
-const environment = (0, _helpers_1.getEnvVar)('NODE_ENV', 'development');
-const config = _config_1.dbConfig[environment];
-const sequelize = new sequelize_1.Sequelize(config);
+const sequelize = new sequelize_1.Sequelize((0, _helpers_1.getEnvVar)('DB_URL'), _config_1.dbConfig);
 exports.sequelize = sequelize;
 const connectDB = async () => {
     try {
@@ -16,7 +13,7 @@ const connectDB = async () => {
         console.log('Database connected!');
         await sequelize.query(`CREATE SCHEMA IF NOT EXISTS operations`);
         await sequelize.sync({
-            alter: environment === 'development',
+            alter: (0, _helpers_1.getEnvVar)('NODE_ENV') === 'development',
             force: false,
             match: /_dev$/,
         });
