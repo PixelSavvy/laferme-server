@@ -132,8 +132,9 @@ const updateFreezoneItem = async (req, res, data) => {
         freezoneItem: existingFreezoneItem,
       };
     }
+    const { products, ...freezoneItemData } = data;
     // Update the order
-    const updatedFreezoneItem = await existingFreezoneItem.update(data, { transaction });
+    const updatedFreezoneItem = await existingFreezoneItem.update(freezoneItemData, { transaction });
     // Rebuild the `FreezoneItemProduct` associations
     const freezoneItemProducts = data.products.map((product) => ({
       freezoneItemId: updatedFreezoneItem.id,
