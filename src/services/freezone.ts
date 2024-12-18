@@ -246,7 +246,7 @@ const updateOrderFreezoneItem = async (data: z.infer<typeof orderSchema>) => {
     return { exists: true, freezoneItem: existingFreezoneItem };
   } catch (error) {
     await transaction.rollback();
-    throw error; // Rethrow the error to be handled by your error handler
+    throw error; 
   }
 };
 
