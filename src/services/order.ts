@@ -10,6 +10,7 @@ import { newOrderSchema, updateOrderSchema } from '@validations';
 const addOrder = async (req: Request, res: Response, data: z.infer<typeof newOrderSchema>) => {
   const transaction = await sequelize.transaction();
   try {
+
     const existingCustomer = await Customer.findByPk(data.customerId, { transaction });
 
     if (!existingCustomer) {
