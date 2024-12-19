@@ -1,10 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.dbConfig = void 0;
-const _helpers_1 = require('@helpers');
+const _helpers_1 = require("@helpers");
 exports.dbConfig = {
-  dialect: 'postgres',
-  port: Number((0, _helpers_1.getEnvVar)('DB_PORT', '5432')),
+  dialect: "postgres",
+  port: Number((0, _helpers_1.getEnvVar)("DB_PORT", "5432")),
   dialectOptions: {
     ssl: {
       require: true,
@@ -12,6 +12,6 @@ exports.dbConfig = {
     },
   },
   logging: false,
-  schema: (0, _helpers_1.getEnvVar)('DB_SCHEMA', 'operations'),
+  schema: (0, _helpers_1.getEnvVar)("DB_SCHEMA", "operations"),
 };
 //# sourceMappingURL=dbconfig.js.map

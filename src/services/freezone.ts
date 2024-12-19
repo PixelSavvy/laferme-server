@@ -1,12 +1,23 @@
-import { sendResponse } from '@helpers';
-import { sequelize } from '@lib';
-import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from '@models';
-import { updateFreezoneItemSchema, updateOrderSchema } from '@validations';
-import { Request, Response } from 'express';
-import { Op } from 'sequelize';
-import { z } from 'zod';
+import { sendResponse } from "@helpers";
+import { sequelize } from "@lib";
+import {
+  Customer,
+  FreezoneItem,
+  FreezoneItemProduct,
+  Order,
+  OrderProduct,
+  Product,
+} from "@models";
+import { updateFreezoneItemSchema, updateOrderSchema } from "@validations";
+import { Request, Response } from "express";
+import { Op } from "sequelize";
+import { z } from "zod";
 
-const addFreezoneItem = async (req: Request, res: Response, orderId: number) => {
+const addFreezoneItem = async (
+  req: Request,
+  res: Response,
+  orderId: number,
+) => {
   const transaction = await sequelize.transaction();
   try {
     // Fetch associated order
@@ -25,7 +36,7 @@ const addFreezoneItem = async (req: Request, res: Response, orderId: number) => 
         status: order.status,
         customerId: order.customerId,
       },
-      { transaction }
+      { transaction },
     );
 
     // Fetch associated order products
@@ -43,7 +54,10 @@ const addFreezoneItem = async (req: Request, res: Response, orderId: number) => 
       adjustedQuantity: 0,
     }));
 
-    const freezoneItemProducts = await FreezoneItemProduct.bulkCreate(transformedFreezoneItemProducts, { transaction });
+    const freezoneItemProducts = await FreezoneItemProduct.bulkCreate(
+      transformedFreezoneItemProducts,
+      { transaction },
+    );
 
     if (freezoneItemProducts.length === 0) return;
 
@@ -64,17 +78,27 @@ const getFreezoneItem = async (req: Request, res: Response, id: number) => {
       include: [
         {
           model: Product,
-          as: 'products',
-          attributes: ['id', 'title', 'productCode'],
+          as: "products",
+          attributes: ["id", "title", "productCode"],
           through: {
-            as: 'freezoneDetails',
-            attributes: ['weight', 'quantity', 'adjustedWeight', 'adjustedQuantity'],
+            as: "freezoneDetails",
+            attributes: [
+              "weight",
+              "quantity",
+              "adjustedWeight",
+              "adjustedQuantity",
+            ],
           },
         },
       ],
     });
 
-    if (!freezoneItem) return sendResponse(res, 404, 'მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა');
+    if (!freezoneItem)
+      return sendResponse(
+        res,
+        404,
+        "მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა",
+      );
 
     return freezoneItem;
   } catch (error) {
@@ -88,11 +112,17 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
       include: [
         {
           model: Product,
-          as: 'products',
-          attributes: ['id', 'title', 'productCode'],
+          as: "products",
+          attributes: ["id", "title", "productCode"],
           through: {
-            as: 'freezoneDetails',
-            attributes: ['weight', 'quantity', 'adjustedWeight', 'adjustedQuantity', 'price'],
+            as: "freezoneDetails",
+            attributes: [
+              "weight",
+              "quantity",
+              "adjustedWeight",
+              "adjustedQuantity",
+              "price",
+            ],
           },
         },
       ],
@@ -115,9 +145,9 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
       include: [
         {
           model: Customer,
-          as: 'customer',
+          as: "customer",
           attributes: {
-            exclude: ['createdAt', 'updatedAt', 'deletedAt'],
+            exclude: ["createdAt", "updatedAt", "deletedAt"],
           },
         },
       ],
@@ -141,14 +171,18 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
   }
 };
 
-const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typeof updateFreezoneItemSchema>) => {
+const updateFreezoneItem = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof updateFreezoneItemSchema>,
+) => {
   const transaction = await sequelize.transaction();
 
   try {
     // Fetch the existing freezone item
     const existingFreezoneItem = await FreezoneItem.findOne({
       where: { id: data.id, orderId: data.id },
-      attributes: ['id'],
+      attributes: ["id"],
       transaction,
     });
 
@@ -169,7 +203,7 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
     // Replace existing associations with the new ones
     await FreezoneItemProduct.bulkCreate(freezoneItemProducts, {
       transaction,
-      updateOnDuplicate: ['adjustedWeight', 'adjustedQuantity'],
+      updateOnDuplicate: ["adjustedWeight", "adjustedQuantity"],
     });
 
     // Commit the transaction
@@ -181,12 +215,16 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
     };
   } catch (error) {
     await transaction.rollback();
-    console.error('Error updating freezone item:', error);
+    console.error("Error updating freezone item:", error);
     throw error;
   }
 };
 
-const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data: z.infer<typeof updateOrderSchema>) => {
+const updateFreezoneItemOnOrderUpdate = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof updateOrderSchema>,
+) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -206,7 +244,9 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
     const newProducts = [];
 
     for (const product of existingProducts) {
-      const updatedProduct = orderProducts.find((p) => p.productId === product.productId);
+      const updatedProduct = orderProducts.find(
+        (p) => p.productId === product.productId,
+      );
 
       // If the product is updated, check if there's any difference
       if (updatedProduct) {
@@ -229,7 +269,9 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
 
     // Add new products that do not exist in existing products
     for (const product of orderProducts) {
-      const existingProduct = existingProducts.find((p) => p.productId === product.productId);
+      const existingProduct = existingProducts.find(
+        (p) => p.productId === product.productId,
+      );
 
       if (!existingProduct) {
         newProducts.push({
@@ -245,12 +287,12 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
     await Promise.all(
       removedProducts.map((product) => {
         return product.destroy({ transaction });
-      })
+      }),
     );
 
     // Insert or update existing products
     await FreezoneItemProduct.bulkCreate(updatedProducts, {
-      updateOnDuplicate: ['price', 'quantity', 'weight'], // Fields to be updated if the product already exists
+      updateOnDuplicate: ["price", "quantity", "weight"], // Fields to be updated if the product already exists
       transaction,
     });
 

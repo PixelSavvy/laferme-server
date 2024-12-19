@@ -1,21 +1,34 @@
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import { z } from 'zod';
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from "sequelize";
+import { z } from "zod";
 
-import { sequelize } from '@lib';
-import { distributionItemSchema as schema } from '@validations';
-import { FreezoneItemInstance } from './freezoneItem';
-import { distributionStatus } from '@config';
+import { sequelize } from "@lib";
+import { distributionItemSchema as schema } from "@validations";
+import { FreezoneItemInstance } from "./freezoneItem";
+import { distributionStatus } from "@config";
 
-const distributionItemSchema = schema.omit({ products: true, createdAt: true, updatedAt: true, deletedAt: true });
+const distributionItemSchema = schema.omit({
+  products: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+});
 
 interface DistributionItemSchema
   extends z.infer<typeof distributionItemSchema>,
-    Model<InferAttributes<DistributionItemSchema>, InferCreationAttributes<DistributionItemSchema, { omit: 'id' }>> {
+    Model<
+      InferAttributes<DistributionItemSchema>,
+      InferCreationAttributes<DistributionItemSchema, { omit: "id" }>
+    > {
   freezone?: FreezoneItemInstance;
 }
 
 const DistributionItem = sequelize.define<DistributionItemSchema>(
-  'DistributionItem',
+  "DistributionItem",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -27,8 +40,8 @@ const DistributionItem = sequelize.define<DistributionItemSchema>(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Orders',
-        key: 'id',
+        model: "Orders",
+        key: "id",
       },
     },
     status: {
@@ -42,13 +55,13 @@ const DistributionItem = sequelize.define<DistributionItemSchema>(
     paranoid: true,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['freezoneItemId'],
+        fields: ["freezoneItemId"],
       },
     ],
-  }
+  },
 );
 
 export { DistributionItem, type DistributionItemSchema };

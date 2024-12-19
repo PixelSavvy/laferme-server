@@ -1,5 +1,5 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendResponse = void 0;
 const sendResponse = (res, status, message, data) => {
   // If there is data, send to the client

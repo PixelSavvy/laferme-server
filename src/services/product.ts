@@ -1,13 +1,17 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
+import { Request, Response } from "express";
+import { z } from "zod";
 
-import { sendResponse } from '@helpers';
+import { sendResponse } from "@helpers";
 
-import { sequelize } from '@lib';
-import { Product } from '@models';
-import { newProductSchema, productSchema } from '@validations';
+import { sequelize } from "@lib";
+import { Product } from "@models";
+import { newProductSchema, productSchema } from "@validations";
 
-const addProduct = async (req: Request, res: Response, data: z.infer<typeof newProductSchema>) => {
+const addProduct = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof newProductSchema>,
+) => {
   const transaction = await sequelize.transaction();
   try {
     const existingProduct = await Product.findOne({
@@ -33,8 +37,8 @@ const addProduct = async (req: Request, res: Response, data: z.infer<typeof newP
       product: newProduct,
     };
   } catch (error) {
-    console.error('Error creating product:', error);
-    throw new Error('Failed to create product');
+    console.error("Error creating product:", error);
+    throw new Error("Failed to create product");
   }
 };
 
@@ -65,7 +69,11 @@ const deleteProduct = async (req: Request, res: Response, id: string) => {
 
     if (!foundProduct) {
       await transaction.rollback();
-      return sendResponse(res, 404, 'პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!');
+      return sendResponse(
+        res,
+        404,
+        "პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!",
+      );
     }
 
     await foundProduct.destroy({ transaction });
@@ -74,18 +82,22 @@ const deleteProduct = async (req: Request, res: Response, id: string) => {
     const checkDeleted = await Product.findByPk(id, { transaction });
     if (checkDeleted) {
       await transaction.rollback();
-      return sendResponse(res, 500, 'პროდუქტის წაშლა ვერ მოხერხდა!');
+      return sendResponse(res, 500, "პროდუქტის წაშლა ვერ მოხერხდა!");
     }
 
     await transaction.commit();
-    return sendResponse(res, 200, 'პროდუქტი წარმატებით წაიშალა!');
+    return sendResponse(res, 200, "პროდუქტი წარმატებით წაიშალა!");
   } catch (error) {
     await transaction.rollback();
     throw error;
   }
 };
 
-const updateProduct = async (req: Request, res: Response, data: z.infer<typeof productSchema>) => {
+const updateProduct = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof productSchema>,
+) => {
   const transaction = await sequelize.transaction();
 
   try {

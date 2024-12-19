@@ -1,7 +1,7 @@
-import { orderStatus } from '@config';
-import { z } from 'zod';
+import { orderStatus } from "@config";
+import { z } from "zod";
 
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
 
 const orderProductSchema = z.object({
   productId: z

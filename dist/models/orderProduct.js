@@ -1,25 +1,25 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderProduct = void 0;
-const _lib_1 = require('@lib');
-const sequelize_1 = require('sequelize');
+const _lib_1 = require("@lib");
+const sequelize_1 = require("sequelize");
 const OrderProduct = _lib_1.sequelize.define(
-  'OrderProduct',
+  "OrderProduct",
   {
     orderId: {
       type: sequelize_1.DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Orders',
-        key: 'id',
+        model: "Orders",
+        key: "id",
       },
     },
     productId: {
       type: sequelize_1.DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Products',
-        key: 'id',
+        model: "Products",
+        key: "id",
       },
     },
     quantity: {
@@ -39,16 +39,16 @@ const OrderProduct = _lib_1.sequelize.define(
     timestamps: false,
     indexes: [
       {
-        fields: ['orderId', 'productId'],
+        fields: ["orderId", "productId"],
       },
       {
-        fields: ['orderId'],
+        fields: ["orderId"],
       },
       {
-        fields: ['productId'],
+        fields: ["productId"],
       },
     ],
-  }
+  },
 );
 exports.OrderProduct = OrderProduct;
 //# sourceMappingURL=orderProduct.js.map

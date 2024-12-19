@@ -1,10 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.freezoneServices = void 0;
-const _helpers_1 = require('@helpers');
-const _lib_1 = require('@lib');
-const _models_1 = require('@models');
-const sequelize_1 = require('sequelize');
+const _helpers_1 = require("@helpers");
+const _lib_1 = require("@lib");
+const _models_1 = require("@models");
+const sequelize_1 = require("sequelize");
 const addFreezoneItem = async (req, res, orderId) => {
   const transaction = await _lib_1.sequelize.transaction();
   try {
@@ -22,7 +22,7 @@ const addFreezoneItem = async (req, res, orderId) => {
         status: order.status,
         customerId: order.customerId,
       },
-      { transaction }
+      { transaction },
     );
     // Fetch associated order products
     const orderProducts = await _models_1.OrderProduct.findAll({
@@ -37,9 +37,12 @@ const addFreezoneItem = async (req, res, orderId) => {
       adjustedWeight: 0,
       adjustedQuantity: 0,
     }));
-    const freezoneItemProducts = await _models_1.FreezoneItemProduct.bulkCreate(transformedFreezoneItemProducts, {
-      transaction,
-    });
+    const freezoneItemProducts = await _models_1.FreezoneItemProduct.bulkCreate(
+      transformedFreezoneItemProducts,
+      {
+        transaction,
+      },
+    );
     if (freezoneItemProducts.length === 0) return;
     await transaction.commit();
     const freezoneItemId = newFreezoneItem.id;
@@ -55,16 +58,26 @@ const getFreezoneItem = async (req, res, id) => {
       include: [
         {
           model: _models_1.Product,
-          as: 'products',
-          attributes: ['id', 'title', 'productCode'],
+          as: "products",
+          attributes: ["id", "title", "productCode"],
           through: {
-            as: 'freezoneDetails',
-            attributes: ['weight', 'quantity', 'adjustedWeight', 'adjustedQuantity'],
+            as: "freezoneDetails",
+            attributes: [
+              "weight",
+              "quantity",
+              "adjustedWeight",
+              "adjustedQuantity",
+            ],
           },
         },
       ],
     });
-    if (!freezoneItem) return (0, _helpers_1.sendResponse)(res, 404, 'მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა');
+    if (!freezoneItem)
+      return (0, _helpers_1.sendResponse)(
+        res,
+        404,
+        "მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა",
+      );
     return freezoneItem;
   } catch (error) {
     throw error;
@@ -76,11 +89,17 @@ const getFreezoneItems = async (req, res, id) => {
       include: [
         {
           model: _models_1.Product,
-          as: 'products',
-          attributes: ['id', 'title', 'productCode'],
+          as: "products",
+          attributes: ["id", "title", "productCode"],
           through: {
-            as: 'freezoneDetails',
-            attributes: ['weight', 'quantity', 'adjustedWeight', 'adjustedQuantity', 'price'],
+            as: "freezoneDetails",
+            attributes: [
+              "weight",
+              "quantity",
+              "adjustedWeight",
+              "adjustedQuantity",
+              "price",
+            ],
           },
         },
       ],
@@ -100,9 +119,9 @@ const getFreezoneItems = async (req, res, id) => {
       include: [
         {
           model: _models_1.Customer,
-          as: 'customer',
+          as: "customer",
           attributes: {
-            exclude: ['createdAt', 'updatedAt', 'deletedAt'],
+            exclude: ["createdAt", "updatedAt", "deletedAt"],
           },
         },
       ],
@@ -128,7 +147,7 @@ const updateFreezoneItem = async (req, res, data) => {
     // Fetch the existing freezone item
     const existingFreezoneItem = await _models_1.FreezoneItem.findOne({
       where: { id: data.id, orderId: data.id },
-      attributes: ['id'],
+      attributes: ["id"],
       transaction,
     });
     // If the freezone item does not exist, return an error
@@ -146,7 +165,7 @@ const updateFreezoneItem = async (req, res, data) => {
     // Replace existing associations with the new ones
     await _models_1.FreezoneItemProduct.bulkCreate(freezoneItemProducts, {
       transaction,
-      updateOnDuplicate: ['adjustedWeight', 'adjustedQuantity'],
+      updateOnDuplicate: ["adjustedWeight", "adjustedQuantity"],
     });
     // Commit the transaction
     await transaction.commit();
@@ -156,7 +175,7 @@ const updateFreezoneItem = async (req, res, data) => {
     };
   } catch (error) {
     await transaction.rollback();
-    console.error('Error updating freezone item:', error);
+    console.error("Error updating freezone item:", error);
     throw error;
   }
 };
@@ -176,7 +195,9 @@ const updateFreezoneItemOnOrderUpdate = async (req, res, data) => {
     const removedProducts = [];
     const newProducts = [];
     for (const product of existingProducts) {
-      const updatedProduct = orderProducts.find((p) => p.productId === product.productId);
+      const updatedProduct = orderProducts.find(
+        (p) => p.productId === product.productId,
+      );
       // If the product is updated, check if there's any difference
       if (updatedProduct) {
         const isUpdated =
@@ -196,7 +217,9 @@ const updateFreezoneItemOnOrderUpdate = async (req, res, data) => {
     }
     // Add new products that do not exist in existing products
     for (const product of orderProducts) {
-      const existingProduct = existingProducts.find((p) => p.productId === product.productId);
+      const existingProduct = existingProducts.find(
+        (p) => p.productId === product.productId,
+      );
       if (!existingProduct) {
         newProducts.push({
           freezoneItemId: orderId,
@@ -210,11 +233,11 @@ const updateFreezoneItemOnOrderUpdate = async (req, res, data) => {
     await Promise.all(
       removedProducts.map((product) => {
         return product.destroy({ transaction });
-      })
+      }),
     );
     // Insert or update existing products
     await _models_1.FreezoneItemProduct.bulkCreate(updatedProducts, {
-      updateOnDuplicate: ['price', 'quantity', 'weight'], // Fields to be updated if the product already exists
+      updateOnDuplicate: ["price", "quantity", "weight"], // Fields to be updated if the product already exists
       transaction,
     });
     // Insert new products that were added

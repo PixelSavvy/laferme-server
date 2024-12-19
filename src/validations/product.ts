@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
-const GEORGIAN_REGEX = new RegExp('^[ა-ჰ\\-,\\s]+$');
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
+const GEORGIAN_REGEX = new RegExp("^[ა-ჰ\\-,\\s]+$");
 
 const pricesSchema = z.object(
   {
@@ -10,54 +10,54 @@ const pricesSchema = z.object(
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
     TR2: z
       .number({
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
     TR3: z
       .number({
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
     TR4: z
       .number({
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
     TR5: z
       .number({
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
     TRC: z
       .number({
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
     TRD: z
       .number({
         required_error: REQUIRED_ERROR_MSG,
       })
       .nonnegative({
-        message: 'დადებითი რიცხვი',
+        message: "დადებითი რიცხვი",
       }),
   },
   {
     required_error: REQUIRED_ERROR_MSG,
-  }
+  },
 );
 
 const newProductSchema = z.object({
@@ -66,12 +66,12 @@ const newProductSchema = z.object({
       required_error: REQUIRED_ERROR_MSG,
     })
     .regex(GEORGIAN_REGEX, {
-      message: 'მხოლოდ ქართული, მძიმე ან/და ტირე',
+      message: "მხოლოდ ქართული, მძიმე ან/და ტირე",
     }),
   productCode: z.string({
     required_error: REQUIRED_ERROR_MSG,
   }),
-  hasVAT: z.enum(['0', '1'], {
+  hasVAT: z.enum(["0", "1"], {
     required_error: REQUIRED_ERROR_MSG,
   }),
   prices: pricesSchema,

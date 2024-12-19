@@ -1,6 +1,6 @@
-import { paths } from '@config';
-import { freezoneController } from '@controllers';
-import express from 'express';
+import { paths } from "@config";
+import { freezoneController } from "@controllers";
+import express from "express";
 
 const router = express.Router();
 

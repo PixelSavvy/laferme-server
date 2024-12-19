@@ -1,21 +1,29 @@
-import { sequelize } from '@lib';
-import { productSchema } from '@validations';
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import { z } from 'zod';
-import { DistributionItemProductInstance } from './distributionItemProduct';
-import { FreezoneItemProductInstance } from './freezoneItemProduct';
-import { OrderProductInstance } from './orderProduct';
+import { sequelize } from "@lib";
+import { productSchema } from "@validations";
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from "sequelize";
+import { z } from "zod";
+import { DistributionItemProductInstance } from "./distributionItemProduct";
+import { FreezoneItemProductInstance } from "./freezoneItemProduct";
+import { OrderProductInstance } from "./orderProduct";
 
 interface ProductInstance
   extends z.infer<typeof productSchema>,
-    Model<InferAttributes<ProductInstance>, InferCreationAttributes<ProductInstance, { omit: 'id' }>> {
+    Model<
+      InferAttributes<ProductInstance>,
+      InferCreationAttributes<ProductInstance, { omit: "id" }>
+    > {
   OrderProduct?: OrderProductInstance[];
   FreezoneItemProducts?: FreezoneItemProductInstance[];
   DistributionItemProducts?: DistributionItemProductInstance[];
 }
 
 const Product = sequelize.define<ProductInstance>(
-  'Product',
+  "Product",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -32,7 +40,7 @@ const Product = sequelize.define<ProductInstance>(
       allowNull: false,
     },
     hasVAT: {
-      type: DataTypes.ENUM('0', '1'),
+      type: DataTypes.ENUM("0", "1"),
       allowNull: false,
     },
     prices: {
@@ -44,13 +52,13 @@ const Product = sequelize.define<ProductInstance>(
     timestamps: false,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['productCode'],
+        fields: ["productCode"],
       },
     ],
-  }
+  },
 );
 
 export { Product, type ProductInstance };

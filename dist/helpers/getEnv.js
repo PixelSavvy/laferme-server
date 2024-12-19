@@ -1,7 +1,7 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.getEnvVar = void 0;
-require('dotenv/config');
+require("dotenv/config");
 const getEnvVar = (name, defaultValue) => {
   const value = process.env[name] || defaultValue;
   if (!value) {

@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 var __importDefault =
   (this && this.__importDefault) ||
   function (mod) {
     return mod && mod.__esModule ? mod : { default: mod };
   };
-Object.defineProperty(exports, '__esModule', { value: true });
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.customerRoutes = void 0;
-const _config_1 = require('@config');
-const _controllers_1 = require('@controllers');
-const express_1 = __importDefault(require('express'));
+const _config_1 = require("@config");
+const _controllers_1 = require("@controllers");
+const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 router.route(_config_1.paths.app.customer).post(async (req, res) => {
   await _controllers_1.customerController.addCustomer(req, res);

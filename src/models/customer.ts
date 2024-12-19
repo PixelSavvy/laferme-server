@@ -1,11 +1,17 @@
-import { BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import { z } from 'zod';
+import {
+  BelongsToManySetAssociationsMixin,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from "sequelize";
+import { z } from "zod";
 
-import { sequelize } from '@lib';
+import { sequelize } from "@lib";
 
-import { paymentOptions, priceIndex } from '@config';
-import { customerSchema as schema } from '@validations';
-import { ProductInstance } from './product';
+import { paymentOptions, priceIndex } from "@config";
+import { customerSchema as schema } from "@validations";
+import { ProductInstance } from "./product";
 
 const customerSchema = schema.omit({
   createdAt: true,
@@ -15,12 +21,15 @@ const customerSchema = schema.omit({
 
 interface CustomerInstance
   extends z.infer<typeof customerSchema>,
-    Model<InferAttributes<CustomerInstance>, InferCreationAttributes<CustomerInstance, { omit: 'id' }>> {
+    Model<
+      InferAttributes<CustomerInstance>,
+      InferCreationAttributes<CustomerInstance, { omit: "id" }>
+    > {
   setProducts: BelongsToManySetAssociationsMixin<ProductInstance, number>;
 }
 
 const Customer = sequelize.define<CustomerInstance>(
-  'Customer',
+  "Customer",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -58,13 +67,13 @@ const Customer = sequelize.define<CustomerInstance>(
     paranoid: true,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['email'],
+        fields: ["email"],
       },
     ],
-  }
+  },
 );
 
 export { Customer, type CustomerInstance };

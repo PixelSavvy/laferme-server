@@ -1,15 +1,17 @@
-import { paymentOptions, priceIndex } from '@config';
-import { z } from 'zod';
-import { productSchema } from './product';
+import { paymentOptions, priceIndex } from "@config";
+import { z } from "zod";
+import { productSchema } from "./product";
 
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
-const GEORGIAN_REGEX = new RegExp('^[ა-ჰ\\s.,?!:;"\'()\\-+@#$%^&*<>[\\]{}|\\\\/]+$');
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
+const GEORGIAN_REGEX = new RegExp(
+  "^[ა-ჰ\\s.,?!:;\"'()\\-+@#$%^&*<>[\\]{}|\\\\/]+$",
+);
 
 const customerProductsSchema = productSchema.pick({ id: true });
 
 const newCustomerSchema = z.object({
   name: z.string({ required_error: REQUIRED_ERROR_MSG }).regex(GEORGIAN_REGEX, {
-    message: 'მხოლოდ ქართული ასოები',
+    message: "მხოლოდ ქართული ასოები",
   }),
   priceIndex: z.enum(priceIndex, {
     required_error: REQUIRED_ERROR_MSG,
@@ -20,8 +22,10 @@ const newCustomerSchema = z.object({
   phone: z.string({
     required_error: REQUIRED_ERROR_MSG,
   }),
-  email: z.string({ required_error: REQUIRED_ERROR_MSG }).email({ message: 'არასწორი ფორმატი' }),
-  needInvoice: z.enum(['0', '1'], {
+  email: z
+    .string({ required_error: REQUIRED_ERROR_MSG })
+    .email({ message: "არასწორი ფორმატი" }),
+  needInvoice: z.enum(["0", "1"], {
     message: REQUIRED_ERROR_MSG,
   }),
   products: z.array(customerProductsSchema).optional(),

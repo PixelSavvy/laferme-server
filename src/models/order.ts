@@ -1,17 +1,31 @@
-import { BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import { z } from 'zod';
+import {
+  BelongsToManySetAssociationsMixin,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from "sequelize";
+import { z } from "zod";
 
-import { orderStatus } from '@config';
-import { sequelize } from '@lib';
-import { orderSchema as schema } from '@validations';
-import { CustomerInstance } from './customer';
-import { OrderProductInstance } from './orderProduct';
+import { orderStatus } from "@config";
+import { sequelize } from "@lib";
+import { orderSchema as schema } from "@validations";
+import { CustomerInstance } from "./customer";
+import { OrderProductInstance } from "./orderProduct";
 
-const orderSchema = schema.omit({ products: true, createdAt: true, updatedAt: true, deletedAt: true });
+const orderSchema = schema.omit({
+  products: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+});
 
 interface OrderInstance
   extends z.infer<typeof orderSchema>,
-    Model<InferAttributes<OrderInstance>, InferCreationAttributes<OrderInstance, { omit: 'id' }>> {
+    Model<
+      InferAttributes<OrderInstance>,
+      InferCreationAttributes<OrderInstance, { omit: "id" }>
+    > {
   products?: OrderProductInstance[];
   customer?: CustomerInstance;
 
@@ -19,7 +33,7 @@ interface OrderInstance
 }
 
 const Order = sequelize.define<OrderInstance>(
-  'Order',
+  "Order",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -31,8 +45,8 @@ const Order = sequelize.define<OrderInstance>(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Customers',
-        key: 'id',
+        model: "Customers",
+        key: "id",
       },
     },
     status: {
@@ -46,13 +60,13 @@ const Order = sequelize.define<OrderInstance>(
     paranoid: true,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['customerId'],
+        fields: ["customerId"],
       },
     ],
-  }
+  },
 );
 
 export { Order, type OrderInstance };

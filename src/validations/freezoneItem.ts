@@ -1,8 +1,8 @@
-import { orderStatus } from '@config';
-import { z } from 'zod';
-import { orderProductSchema } from './order';
+import { orderStatus } from "@config";
+import { z } from "zod";
+import { orderProductSchema } from "./order";
 
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
 
 const freezoneItemProductsSchema = orderProductSchema.extend({
   freezoneItemId: z.number().nonnegative(),
@@ -35,4 +35,9 @@ const updateFreezoneItemSchema = z.object({
   products: z.array(freezoneItemProductsSchema),
 });
 
-export { freezoneItemProductsSchema, freezoneItemSchema, newFreezoneItemSchema, updateFreezoneItemSchema };
+export {
+  freezoneItemProductsSchema,
+  freezoneItemSchema,
+  newFreezoneItemSchema,
+  updateFreezoneItemSchema,
+};

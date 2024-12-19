@@ -1,13 +1,13 @@
-import { Options } from 'sequelize';
+import { Options } from "sequelize";
 
-import { getEnvVar } from '@helpers';
+import { getEnvVar } from "@helpers";
 
 interface DbConfig {
   [key: string]: Options;
 }
 export const dbConfig: Options = {
-  dialect: 'postgres',
-  port: Number(getEnvVar('DB_PORT', '5432')),
+  dialect: "postgres",
+  port: Number(getEnvVar("DB_PORT", "5432")),
   dialectOptions: {
     ssl: {
       require: true,
@@ -15,5 +15,5 @@ export const dbConfig: Options = {
     },
   },
   logging: false,
-  schema: getEnvVar('DB_SCHEMA', 'operations'),
+  schema: getEnvVar("DB_SCHEMA", "operations"),
 };

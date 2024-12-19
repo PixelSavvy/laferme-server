@@ -1,10 +1,13 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.newDistributionItemSchema = exports.distributionItemSchema = exports.distributionItemProductsSchema = void 0;
-const zod_1 = require('zod');
-const freezoneItem_1 = require('./freezoneItem');
-const _config_1 = require('@config');
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.newDistributionItemSchema =
+  exports.distributionItemSchema =
+  exports.distributionItemProductsSchema =
+    void 0;
+const zod_1 = require("zod");
+const freezoneItem_1 = require("./freezoneItem");
+const _config_1 = require("@config");
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
 const distributionItemProductsSchema = freezoneItem_1.freezoneItemProductsSchema
   .extend({
     distributedWeight: zod_1.z.number().nonnegative(),

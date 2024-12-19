@@ -1,10 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.DistributionItem = void 0;
-const sequelize_1 = require('sequelize');
-const _lib_1 = require('@lib');
-const _validations_1 = require('@validations');
-const _config_1 = require('@config');
+const sequelize_1 = require("sequelize");
+const _lib_1 = require("@lib");
+const _validations_1 = require("@validations");
+const _config_1 = require("@config");
 const distributionItemSchema = _validations_1.distributionItemSchema.omit({
   products: true,
   createdAt: true,
@@ -12,7 +12,7 @@ const distributionItemSchema = _validations_1.distributionItemSchema.omit({
   deletedAt: true,
 });
 const DistributionItem = _lib_1.sequelize.define(
-  'DistributionItem',
+  "DistributionItem",
   {
     id: {
       type: sequelize_1.DataTypes.INTEGER,
@@ -24,8 +24,8 @@ const DistributionItem = _lib_1.sequelize.define(
       type: sequelize_1.DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Orders',
-        key: 'id',
+        model: "Orders",
+        key: "id",
       },
     },
     status: {
@@ -39,13 +39,13 @@ const DistributionItem = _lib_1.sequelize.define(
     paranoid: true,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['freezoneItemId'],
+        fields: ["freezoneItemId"],
       },
     ],
-  }
+  },
 );
 exports.DistributionItem = DistributionItem;
 //# sourceMappingURL=distributionItem.js.map
