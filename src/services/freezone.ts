@@ -312,7 +312,7 @@ const deleteFreezoneItem = async (req: Request, res: Response, id: number) => {
     };
   } catch (error) {
     await transaction.rollback();
-    throw error; 
+    throw error;
   }
 };
 
