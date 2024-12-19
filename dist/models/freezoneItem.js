@@ -1,10 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.FreezoneItem = void 0;
-const sequelize_1 = require('sequelize');
-const _config_1 = require('@config');
-const _lib_1 = require('@lib');
-const _validations_1 = require('@validations');
+const sequelize_1 = require("sequelize");
+const _config_1 = require("@config");
+const _lib_1 = require("@lib");
+const _validations_1 = require("@validations");
 const freezoneItemSchema = _validations_1.freezoneItemSchema.omit({
   products: true,
   createdAt: true,
@@ -12,7 +12,7 @@ const freezoneItemSchema = _validations_1.freezoneItemSchema.omit({
   deletedAt: true,
 });
 const FreezoneItem = _lib_1.sequelize.define(
-  'FreezoneItem',
+  "FreezoneItem",
   {
     id: {
       type: sequelize_1.DataTypes.INTEGER,
@@ -24,16 +24,16 @@ const FreezoneItem = _lib_1.sequelize.define(
       type: sequelize_1.DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Orders',
-        key: 'id',
+        model: "Orders",
+        key: "id",
       },
     },
     customerId: {
       type: sequelize_1.DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Customers',
-        key: 'id',
+        model: "Customers",
+        key: "id",
       },
     },
     status: {
@@ -47,13 +47,13 @@ const FreezoneItem = _lib_1.sequelize.define(
     paranoid: true,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['orderId'],
+        fields: ["orderId"],
       },
     ],
-  }
+  },
 );
 exports.FreezoneItem = FreezoneItem;
 //# sourceMappingURL=freezoneItem.js.map

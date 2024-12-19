@@ -1,6 +1,6 @@
-import { paths } from '@config';
-import { orderController } from '@controllers';
-import express from 'express';
+import { paths } from "@config";
+import { orderController } from "@controllers";
+import express from "express";
 
 const router = express.Router();
 

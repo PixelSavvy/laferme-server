@@ -1,10 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.customerServices = void 0;
-const _models_1 = require('@models');
-const _helpers_1 = require('@helpers');
-const _lib_1 = require('@lib');
-const sequelize_1 = require('sequelize');
+const _models_1 = require("@models");
+const _helpers_1 = require("@helpers");
+const _lib_1 = require("@lib");
+const sequelize_1 = require("sequelize");
 const addCustomer = async (req, res, data) => {
   const transaction = await _lib_1.sequelize.transaction();
   try {
@@ -46,8 +46,8 @@ const addCustomer = async (req, res, data) => {
     };
   } catch (error) {
     await transaction.rollback();
-    console.log('Failed to add a customer', error);
-    throw new Error('Failed to create customer');
+    console.log("Failed to add a customer", error);
+    throw new Error("Failed to create customer");
   }
 };
 const getCustomers = async (req, res) => {
@@ -56,7 +56,7 @@ const getCustomers = async (req, res) => {
       include: [
         {
           model: _models_1.Product,
-          as: 'products',
+          as: "products",
           through: {
             attributes: [],
           },
@@ -75,7 +75,7 @@ const getCustomer = async (req, res) => {
       include: [
         {
           model: _models_1.Product,
-          as: 'products',
+          as: "products",
           through: {
             attributes: [],
           },
@@ -91,12 +91,16 @@ const getCustomer = async (req, res) => {
 const updateCustomer = async (data) => {
   const transaction = await _lib_1.sequelize.transaction();
   try {
-    const existingCustomer = await _models_1.Customer.findByPk(data.id, { transaction });
+    const existingCustomer = await _models_1.Customer.findByPk(data.id, {
+      transaction,
+    });
     if (!existingCustomer) {
       await transaction.rollback();
       return { exists: false, customer: null };
     }
-    const updatedCustomer = await existingCustomer.update(data, { transaction });
+    const updatedCustomer = await existingCustomer.update(data, {
+      transaction,
+    });
     let existingProducts = [];
     if (data.products && data.products.length > 0) {
       const productIds = data.products.map((product) => product.id);
@@ -121,20 +125,34 @@ const updateCustomer = async (data) => {
 const deleteCustomer = async (req, res, id) => {
   const transaction = await _lib_1.sequelize.transaction();
   try {
-    const foundCustomer = await _models_1.Customer.findByPk(id, { transaction });
+    const foundCustomer = await _models_1.Customer.findByPk(id, {
+      transaction,
+    });
     if (!foundCustomer) {
       await transaction.rollback();
-      return (0, _helpers_1.sendResponse)(res, 404, 'სარეალიზაციო პუნქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!');
+      return (0, _helpers_1.sendResponse)(
+        res,
+        404,
+        "სარეალიზაციო პუნქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!",
+      );
     }
     await foundCustomer.destroy({ transaction });
     // Verify the customer is no longer in the database
     const checkDeleted = await _models_1.Customer.findByPk(id, { transaction });
     if (checkDeleted) {
       await transaction.rollback();
-      return (0, _helpers_1.sendResponse)(res, 500, 'სარეალიზაციო პუნქტის წაშლა ვერ მოხერხდა!');
+      return (0, _helpers_1.sendResponse)(
+        res,
+        500,
+        "სარეალიზაციო პუნქტის წაშლა ვერ მოხერხდა!",
+      );
     }
     await transaction.commit();
-    return (0, _helpers_1.sendResponse)(res, 200, 'სარეალიზაციო პუნქტი წარმატებით წაიშალა!');
+    return (0, _helpers_1.sendResponse)(
+      res,
+      200,
+      "სარეალიზაციო პუნქტი წარმატებით წაიშალა!",
+    );
   } catch (error) {
     await transaction.rollback();
     throw error;

@@ -1,8 +1,16 @@
-import { sequelize } from '@lib';
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import { sequelize } from "@lib";
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from "sequelize";
 
 interface OrderProductInstance
-  extends Model<InferAttributes<OrderProductInstance>, InferCreationAttributes<OrderProductInstance>> {
+  extends Model<
+    InferAttributes<OrderProductInstance>,
+    InferCreationAttributes<OrderProductInstance>
+  > {
   orderId: number;
   productId: number;
   quantity: number;
@@ -11,22 +19,22 @@ interface OrderProductInstance
 }
 
 const OrderProduct = sequelize.define<OrderProductInstance>(
-  'OrderProduct',
+  "OrderProduct",
   {
     orderId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Orders',
-        key: 'id',
+        model: "Orders",
+        key: "id",
       },
     },
     productId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Products',
-        key: 'id',
+        model: "Products",
+        key: "id",
       },
     },
     quantity: {
@@ -46,17 +54,17 @@ const OrderProduct = sequelize.define<OrderProductInstance>(
     timestamps: false,
     indexes: [
       {
-        fields: ['orderId', 'productId'],
+        fields: ["orderId", "productId"],
       },
 
       {
-        fields: ['orderId'],
+        fields: ["orderId"],
       },
       {
-        fields: ['productId'],
+        fields: ["productId"],
       },
     ],
-  }
+  },
 );
 
 export { OrderProduct, type OrderProductInstance };

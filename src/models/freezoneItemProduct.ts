@@ -1,29 +1,37 @@
-import { sequelize } from '@lib';
-import { freezoneItemProductsSchema } from '@validations';
-import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
-import { z } from 'zod';
+import { sequelize } from "@lib";
+import { freezoneItemProductsSchema } from "@validations";
+import {
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from "sequelize";
+import { z } from "zod";
 
 interface FreezoneItemProductInstance
   extends z.infer<typeof freezoneItemProductsSchema>,
-    Model<InferAttributes<FreezoneItemProductInstance>, InferCreationAttributes<FreezoneItemProductInstance>> {}
+    Model<
+      InferAttributes<FreezoneItemProductInstance>,
+      InferCreationAttributes<FreezoneItemProductInstance>
+    > {}
 
 const FreezoneItemProduct = sequelize.define<FreezoneItemProductInstance>(
-  'FreezoneItemProduct',
+  "FreezoneItemProduct",
   {
     freezoneItemId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'FreezoneItems',
-        key: 'id',
+        model: "FreezoneItems",
+        key: "id",
       },
     },
     productId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Products',
-        key: 'id',
+        model: "Products",
+        key: "id",
       },
     },
     quantity: {
@@ -53,17 +61,17 @@ const FreezoneItemProduct = sequelize.define<FreezoneItemProductInstance>(
     timestamps: false,
     indexes: [
       {
-        fields: ['productId', 'freezoneItemId'],
+        fields: ["productId", "freezoneItemId"],
       },
 
       {
-        fields: ['freezoneItemId'],
+        fields: ["freezoneItemId"],
       },
       {
-        fields: ['productId'],
+        fields: ["productId"],
       },
     ],
-  }
+  },
 );
 
 export { FreezoneItemProduct, type FreezoneItemProductInstance };

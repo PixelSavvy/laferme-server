@@ -1,15 +1,15 @@
 export const paths = {
-  root: '/api',
+  root: "/api",
   app: {
-    product: '/products',
-    customer: '/customers',
-    order: '/orders',
-    freezone: '/freezone-items',
-    distribution: '/distribution-items',
+    product: "/products",
+    customer: "/customers",
+    order: "/orders",
+    freezone: "/freezone-items",
+    distribution: "/distribution-items",
   },
   auth: {
-    signin: '/auth/signin',
-    signup: '/auth/signup',
-    resetPassword: '/auth/reset-password',
+    signin: "/auth/signin",
+    signup: "/auth/signup",
+    resetPassword: "/auth/reset-password",
   },
 };

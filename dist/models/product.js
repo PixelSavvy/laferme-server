@@ -1,10 +1,10 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Product = void 0;
-const _lib_1 = require('@lib');
-const sequelize_1 = require('sequelize');
+const _lib_1 = require("@lib");
+const sequelize_1 = require("sequelize");
 const Product = _lib_1.sequelize.define(
-  'Product',
+  "Product",
   {
     id: {
       type: sequelize_1.DataTypes.INTEGER,
@@ -21,7 +21,7 @@ const Product = _lib_1.sequelize.define(
       allowNull: false,
     },
     hasVAT: {
-      type: sequelize_1.DataTypes.ENUM('0', '1'),
+      type: sequelize_1.DataTypes.ENUM("0", "1"),
       allowNull: false,
     },
     prices: {
@@ -33,13 +33,13 @@ const Product = _lib_1.sequelize.define(
     timestamps: false,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['productCode'],
+        fields: ["productCode"],
       },
     ],
-  }
+  },
 );
 exports.Product = Product;
 //# sourceMappingURL=product.js.map

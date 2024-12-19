@@ -1,9 +1,9 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.productServices = void 0;
-const _helpers_1 = require('@helpers');
-const _lib_1 = require('@lib');
-const _models_1 = require('@models');
+const _helpers_1 = require("@helpers");
+const _lib_1 = require("@lib");
+const _models_1 = require("@models");
 const addProduct = async (req, res, data) => {
   const transaction = await _lib_1.sequelize.transaction();
   try {
@@ -26,8 +26,8 @@ const addProduct = async (req, res, data) => {
       product: newProduct,
     };
   } catch (error) {
-    console.error('Error creating product:', error);
-    throw new Error('Failed to create product');
+    console.error("Error creating product:", error);
+    throw new Error("Failed to create product");
   }
 };
 const getProducts = async (req, res) => {
@@ -52,17 +52,29 @@ const deleteProduct = async (req, res, id) => {
     const foundProduct = await _models_1.Product.findByPk(id, { transaction });
     if (!foundProduct) {
       await transaction.rollback();
-      return (0, _helpers_1.sendResponse)(res, 404, 'პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!');
+      return (0, _helpers_1.sendResponse)(
+        res,
+        404,
+        "პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!",
+      );
     }
     await foundProduct.destroy({ transaction });
     // Verify the product is no longer in the database
     const checkDeleted = await _models_1.Product.findByPk(id, { transaction });
     if (checkDeleted) {
       await transaction.rollback();
-      return (0, _helpers_1.sendResponse)(res, 500, 'პროდუქტის წაშლა ვერ მოხერხდა!');
+      return (0, _helpers_1.sendResponse)(
+        res,
+        500,
+        "პროდუქტის წაშლა ვერ მოხერხდა!",
+      );
     }
     await transaction.commit();
-    return (0, _helpers_1.sendResponse)(res, 200, 'პროდუქტი წარმატებით წაიშალა!');
+    return (0, _helpers_1.sendResponse)(
+      res,
+      200,
+      "პროდუქტი წარმატებით წაიშალა!",
+    );
   } catch (error) {
     await transaction.rollback();
     throw error;

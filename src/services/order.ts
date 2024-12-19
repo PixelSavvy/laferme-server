@@ -1,17 +1,22 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
+import { Request, Response } from "express";
+import { z } from "zod";
 
-import { sequelize } from '@lib';
+import { sequelize } from "@lib";
 
-import { sendResponse } from '@helpers';
-import { Customer, Order, OrderProduct, Product } from '@models';
-import { newOrderSchema, updateOrderSchema } from '@validations';
+import { sendResponse } from "@helpers";
+import { Customer, Order, OrderProduct, Product } from "@models";
+import { newOrderSchema, updateOrderSchema } from "@validations";
 
-const addOrder = async (req: Request, res: Response, data: z.infer<typeof newOrderSchema>) => {
+const addOrder = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof newOrderSchema>,
+) => {
   const transaction = await sequelize.transaction();
   try {
-
-    const existingCustomer = await Customer.findByPk(data.customerId, { transaction });
+    const existingCustomer = await Customer.findByPk(data.customerId, {
+      transaction,
+    });
 
     if (!existingCustomer) {
       await transaction.rollback();
@@ -44,23 +49,23 @@ const getOrder = async (req: Request, res: Response, id: number) => {
   try {
     const existingOrder = await Order.findByPk(id, {
       attributes: {
-        exclude: ['customerId'],
+        exclude: ["customerId"],
       },
       include: [
         {
           model: Customer,
-          as: 'customer',
+          as: "customer",
           attributes: {
-            include: ['createdAt', 'updatedAt', 'deletedAt'],
+            include: ["createdAt", "updatedAt", "deletedAt"],
           },
         },
         {
           model: Product,
-          as: 'products',
-          attributes: ['id', 'title', 'productCode', 'hasVAT'],
+          as: "products",
+          attributes: ["id", "title", "productCode", "hasVAT"],
           through: {
-            as: 'orderDetails',
-            attributes: ['quantity', 'weight', 'price'],
+            as: "orderDetails",
+            attributes: ["quantity", "weight", "price"],
           },
         },
       ],
@@ -85,23 +90,23 @@ const getOrders = async (req: Request, res: Response) => {
   try {
     const existingOrders = await Order.findAll({
       attributes: {
-        exclude: ['customerId'],
+        exclude: ["customerId"],
       },
       include: [
         {
           model: Customer,
-          as: 'customer',
+          as: "customer",
           attributes: {
-            exclude: ['createdAt', 'updatedAt', 'deletedAt'],
+            exclude: ["createdAt", "updatedAt", "deletedAt"],
           },
         },
         {
           model: Product,
-          as: 'products',
-          attributes: ['id', 'title', 'productCode', 'hasVAT'],
+          as: "products",
+          attributes: ["id", "title", "productCode", "hasVAT"],
           through: {
-            as: 'orderDetails',
-            attributes: ['quantity', 'weight', 'price'],
+            as: "orderDetails",
+            attributes: ["quantity", "weight", "price"],
           },
         },
       ],
@@ -129,7 +134,11 @@ const deleteOrder = async (req: Request, res: Response, id: number) => {
 
     if (!foundOrder) {
       await transaction.rollback();
-      return sendResponse(res, 404, 'შეკვეთა მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!');
+      return sendResponse(
+        res,
+        404,
+        "შეკვეთა მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!",
+      );
     }
 
     await foundOrder.destroy({ transaction });
@@ -138,18 +147,22 @@ const deleteOrder = async (req: Request, res: Response, id: number) => {
     const checkDeleted = await Order.findByPk(id, { transaction });
     if (checkDeleted) {
       await transaction.rollback();
-      return sendResponse(res, 500, 'შეკვეთის წაშლა ვერ მოხერხდა!');
+      return sendResponse(res, 500, "შეკვეთის წაშლა ვერ მოხერხდა!");
     }
 
     await transaction.commit();
-    return sendResponse(res, 200, 'შეკვეთა წარმატებით წაიშალა!');
+    return sendResponse(res, 200, "შეკვეთა წარმატებით წაიშალა!");
   } catch (error) {
     await transaction.rollback();
     throw error;
   }
 };
 
-const updateOrder = async (req: Request, res: Response, data: z.infer<typeof updateOrderSchema>) => {
+const updateOrder = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof updateOrderSchema>,
+) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -161,7 +174,7 @@ const updateOrder = async (req: Request, res: Response, data: z.infer<typeof upd
       await transaction.rollback();
       return {
         exists: false,
-        message: 'Order not found',
+        message: "Order not found",
       };
     }
 
@@ -182,13 +195,19 @@ const updateOrder = async (req: Request, res: Response, data: z.infer<typeof upd
       const newProductIds = products.map((p) => p.productId);
 
       // Identify products to be added
-      const productsToAdd = products.filter((p) => !existingProductIds.includes(p.productId));
+      const productsToAdd = products.filter(
+        (p) => !existingProductIds.includes(p.productId),
+      );
 
       // Identify products to be updated (those that already exist)
-      const productsToUpdate = products.filter((p) => existingProductIds.includes(p.productId));
+      const productsToUpdate = products.filter((p) =>
+        existingProductIds.includes(p.productId),
+      );
 
       // Identify products to be removed (those that no longer exist in the new list)
-      const productsToRemove = existingOrderProducts.filter((p) => !newProductIds.includes(p.productId));
+      const productsToRemove = existingOrderProducts.filter(
+        (p) => !newProductIds.includes(p.productId),
+      );
 
       // 1. Remove old products no longer in the order
       await OrderProduct.destroy({
@@ -208,7 +227,9 @@ const updateOrder = async (req: Request, res: Response, data: z.infer<typeof upd
 
       // 3. Update existing products
       for (const product of productsToUpdate) {
-        const orderProduct = existingOrderProducts.find((p) => p.productId === product.productId);
+        const orderProduct = existingOrderProducts.find(
+          (p) => p.productId === product.productId,
+        );
         if (orderProduct) {
           await orderProduct.update(product, { transaction });
         }
@@ -224,7 +245,7 @@ const updateOrder = async (req: Request, res: Response, data: z.infer<typeof upd
     };
   } catch (error) {
     await transaction.rollback();
-    console.error('Error updating order:', error);
+    console.error("Error updating order:", error);
     throw error;
   }
 };

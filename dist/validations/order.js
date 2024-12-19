@@ -1,9 +1,13 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.updateOrderSchema = exports.orderSchema = exports.orderProductSchema = exports.newOrderSchema = void 0;
-const _config_1 = require('@config');
-const zod_1 = require('zod');
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateOrderSchema =
+  exports.orderSchema =
+  exports.orderProductSchema =
+  exports.newOrderSchema =
+    void 0;
+const _config_1 = require("@config");
+const zod_1 = require("zod");
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
 const orderProductSchema = zod_1.z.object({
   productId: zod_1.z
     .number({

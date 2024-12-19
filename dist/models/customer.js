@@ -1,17 +1,17 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Customer = void 0;
-const sequelize_1 = require('sequelize');
-const _lib_1 = require('@lib');
-const _config_1 = require('@config');
-const _validations_1 = require('@validations');
+const sequelize_1 = require("sequelize");
+const _lib_1 = require("@lib");
+const _config_1 = require("@config");
+const _validations_1 = require("@validations");
 const customerSchema = _validations_1.customerSchema.omit({
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
 });
 const Customer = _lib_1.sequelize.define(
-  'Customer',
+  "Customer",
   {
     id: {
       type: sequelize_1.DataTypes.INTEGER,
@@ -49,13 +49,13 @@ const Customer = _lib_1.sequelize.define(
     paranoid: true,
     indexes: [
       {
-        fields: ['id'],
+        fields: ["id"],
       },
       {
-        fields: ['email'],
+        fields: ["email"],
       },
     ],
-  }
+  },
 );
 exports.Customer = Customer;
 //# sourceMappingURL=customer.js.map

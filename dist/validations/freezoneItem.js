@@ -1,14 +1,14 @@
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateFreezoneItemSchema =
   exports.newFreezoneItemSchema =
   exports.freezoneItemSchema =
   exports.freezoneItemProductsSchema =
     void 0;
-const _config_1 = require('@config');
-const zod_1 = require('zod');
-const order_1 = require('./order');
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
+const _config_1 = require("@config");
+const zod_1 = require("zod");
+const order_1 = require("./order");
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
 const freezoneItemProductsSchema = order_1.orderProductSchema.extend({
   freezoneItemId: zod_1.z.number().nonnegative(),
   adjustedWeight: zod_1.z.number().nonnegative(),

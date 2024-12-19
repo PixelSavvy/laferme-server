@@ -1,8 +1,8 @@
-import { z } from 'zod';
-import { freezoneItemProductsSchema } from './freezoneItem';
-import { distributionStatus } from '@config';
+import { z } from "zod";
+import { freezoneItemProductsSchema } from "./freezoneItem";
+import { distributionStatus } from "@config";
 
-const REQUIRED_ERROR_MSG = 'სავალდებულოა';
+const REQUIRED_ERROR_MSG = "სავალდებულოა";
 
 const distributionItemProductsSchema = freezoneItemProductsSchema
   .extend({
@@ -33,4 +33,8 @@ const distributionItemSchema = newDistributionItemSchema.extend({
   deletedAt: z.coerce.date().nullable().optional(),
 });
 
-export { distributionItemProductsSchema, distributionItemSchema, newDistributionItemSchema };
+export {
+  distributionItemProductsSchema,
+  distributionItemSchema,
+  newDistributionItemSchema,
+};

@@ -14,7 +14,8 @@
     ],
     "**/*.{json,md,css,scss,html,js,jsx,ts,tsx}": [
       "npx prettier . --write"
-    ]
+    ],
+    "*.js": "eslint --cache --fix"
   },
   "main": "dist/server.js",
   "dependencies": {
