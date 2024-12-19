@@ -5,7 +5,11 @@ import { sequelize } from "@lib";
 
 import { sendResponse } from "@helpers";
 import { Customer, Order, OrderProduct, Product } from "@models";
-import { newOrderSchema, updateOrderSchema } from "@validations";
+import {
+  newOrderSchema,
+  updateOrderSchema,
+  updateOrderStatusSchema,
+} from "@validations";
 
 const addOrder = async (
   req: Request,
@@ -250,10 +254,48 @@ const updateOrder = async (
   }
 };
 
+const updateOrderStatus = async (
+  data: z.infer<typeof updateOrderStatusSchema>,
+) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const existingOrder = await Order.findByPk(data.id, { transaction });
+
+    if (!existingOrder) {
+      await transaction.rollback();
+      return {
+        exists: false,
+        order: existingOrder,
+      };
+    }
+
+    const updatedOrder = await existingOrder
+      .update(
+        {
+          status: data.status,
+        },
+        { transaction },
+      )
+      .finally(async () => {
+        await transaction.commit();
+      });
+
+    return {
+      exists: true,
+      order: updatedOrder,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 export const orderServices = {
   addOrder,
   getOrder,
   getOrders,
   deleteOrder,
   updateOrder,
+  updateOrderStatus,
 };

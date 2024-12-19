@@ -1,7 +1,11 @@
 import { sendResponse } from "@helpers";
 import { sequelize } from "@lib";
 import { freezoneServices, orderServices } from "@services";
-import { newOrderSchema, updateOrderSchema } from "@validations";
+import {
+  newOrderSchema,
+  updateOrderSchema,
+  updateOrderStatusSchema,
+} from "@validations";
 import { Request, Response } from "express";
 
 const addOrder = async (req: Request, res: Response) => {
@@ -153,10 +157,65 @@ const updateOrder = async (req: Request, res: Response) => {
   }
 };
 
+const updateOrderStatus = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction();
+  const { id, status } = req.params;
+  const data = { id: Number(id), status };
+
+  const parsedData = updateOrderStatusSchema.safeParse(data);
+
+  if (!parsedData.success)
+    return sendResponse(
+      res,
+      400,
+      "Validation error",
+      parsedData.error.format(),
+    );
+
+  try {
+    const updatedOrder = await orderServices.updateOrderStatus(data);
+
+    if (!updatedOrder.exists) {
+      await transaction.rollback();
+      return sendResponse(res, 404, "შეკვეთა ვერ მოიძებნა", updatedOrder.order);
+    }
+
+    const updatedFreezoneItem =
+      await freezoneServices.updateFreezoneItemStatus(data);
+
+    if (!updatedFreezoneItem.exists) {
+      await transaction.rollback();
+      return sendResponse(
+        res,
+        500,
+        "შეცდომა შეკვეთის თავისუფალ ზონის სტატუსის განახლებისას",
+      );
+    }
+
+    await transaction.commit();
+    return sendResponse(
+      res,
+      200,
+      "შეკვეთის სტატუსი წარმატებით განახლდა",
+      updatedFreezoneItem.freezoneItem,
+    );
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error updating an order status:", error);
+    return sendResponse(
+      res,
+      500,
+      "შეცდომა შეკვეთის სტატუსის განახლებისას",
+      error,
+    );
+  }
+};
+
 export const orderController = {
   addOrder,
   getOrder,
   getOrders,
   deleteOrder,
   updateOrder,
+  updateOrderStatus,
 };

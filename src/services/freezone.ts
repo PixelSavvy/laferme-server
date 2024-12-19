@@ -8,7 +8,11 @@ import {
   OrderProduct,
   Product,
 } from "@models";
-import { updateFreezoneItemSchema, updateOrderSchema } from "@validations";
+import {
+  updateFreezoneItemSchema,
+  updateFreezoneItemStatusSchema,
+  updateOrderSchema,
+} from "@validations";
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { z } from "zod";
@@ -358,6 +362,45 @@ const deleteFreezoneItem = async (req: Request, res: Response, id: number) => {
   }
 };
 
+const updateFreezoneItemStatus = async (
+  data: z.infer<typeof updateFreezoneItemStatusSchema>,
+) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const existingFreezoneItem = await FreezoneItem.findByPk(data.id, {
+      transaction,
+    });
+
+    if (!existingFreezoneItem) {
+      await transaction.rollback();
+      return {
+        exists: false,
+        freezoneItem: existingFreezoneItem,
+      };
+    }
+
+    const updatedFreezoneItem = await existingFreezoneItem
+      .update(
+        {
+          status: data.status,
+        },
+        { transaction },
+      )
+      .finally(async () => {
+        await transaction.commit();
+      });
+
+    return {
+      exists: true,
+      freezoneItem: updatedFreezoneItem,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 export const freezoneServices = {
   addFreezoneItem,
   getFreezoneItem,
@@ -365,4 +408,5 @@ export const freezoneServices = {
   updateFreezoneItem,
   updateFreezoneItemOnOrderUpdate,
   deleteFreezoneItem,
+  updateFreezoneItemStatus,
 };

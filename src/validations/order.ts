@@ -47,4 +47,15 @@ const updateOrderSchema = z.object({
   products: z.array(orderProductSchema),
 });
 
-export { newOrderSchema, orderProductSchema, orderSchema, updateOrderSchema };
+const updateOrderStatusSchema = z.object({
+  id: z.number().nonnegative(),
+  status: z.enum(orderStatus),
+});
+
+export {
+  newOrderSchema,
+  orderProductSchema,
+  orderSchema,
+  updateOrderSchema,
+  updateOrderStatusSchema,
+};
