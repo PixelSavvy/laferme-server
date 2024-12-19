@@ -4,7 +4,7 @@ import "dotenv/config";
 
 import { Sequelize } from "sequelize";
 
-const sequelize = new Sequelize(getEnvVar("DB_URL"), dbConfig);
+const sequelize = new Sequelize(dbConfig);
 
 const connectDB = async () => {
   try {
