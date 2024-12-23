@@ -3,7 +3,8 @@
   "scripts": {
     "build": "rimraf dist && webpack --config webpack.config.js",
     "dev": "tsx watch --env-file=.env.development  src/index.ts",
-    "prod": "npm run build && node -r tsconfig-paths/register dist/index.cjs",
+    "preserve": "npm run build",
+    "serve": "npm run build && node -r tsconfig-paths/register dist/index.cjs",
     "prepare": "husky",
     "lint": "eslint . --cache --format  stylish --fix",
     "format": "npx prettier . --write"
