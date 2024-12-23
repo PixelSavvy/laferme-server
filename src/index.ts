@@ -3,6 +3,8 @@ import express from "express";
 
 import cookieParser from "cookie-parser";
 
+import compression from "compression";
+
 import { corsOptions, paths } from "@/config";
 import { connectDB } from "@/lib";
 import { customerRoutes, distributionRoutes, freezoneRoutes, orderRoutes, productRoutes } from "@/routes";
@@ -17,6 +19,8 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 app.use(cookieParser());
+
+app.use(compression());
 
 // routes
 app.use(paths.root, productRoutes);
