@@ -1,6 +1,9 @@
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
 import path from "path";
+import TerserPlugin from "terser-webpack-plugin";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
 import { fileURLToPath } from "url";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import nodeExternals from "webpack-node-externals";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,37 +15,75 @@ const __dirname = path.dirname(__filename);
 
 const config = {
   mode: "production",
-  entry: path.resolve(__dirname, "src/index.ts"),
   target: "node",
+
+  entry: path.resolve(__dirname, "src/index.ts"),
 
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "index.cjs",
+    filename: "index.min.cjs",
+    libraryTarget: "commonjs2",
   },
 
   resolve: {
-    extensions: [".ts"],
+    extensions: [".ts", ".js"],
     plugins: [
       new TsconfigPathsPlugin({
         configFile: path.resolve(__dirname, "tsconfig.json"),
       }),
     ],
   },
-  externals: [nodeExternals()],
+
   module: {
     rules: [
       {
         test: /\.ts$/,
-        exclude: /node_modules/,
         use: {
           loader: "ts-loader",
           options: {
             configFile: path.resolve(__dirname, "tsconfig.json"),
           },
         },
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.js$/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+          },
+        },
+        exclude: /node_modules/,
       },
     ],
   },
+
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+    ],
+  },
+
+  externals: [nodeExternals()],
+
+  plugins: [
+    new CleanWebpackPlugin({
+      verbose: true,
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: "static",
+      openAnalyzer: false,
+      reportFilename: path.resolve(__dirname, "bundle-report.html"),
+    }),
+  ],
 };
 
 export default config;
