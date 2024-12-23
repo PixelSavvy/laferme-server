@@ -3,7 +3,6 @@ import path from "path";
 import TerserPlugin from "terser-webpack-plugin";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
 import { fileURLToPath } from "url";
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import nodeExternals from "webpack-node-externals";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -77,11 +76,6 @@ const config = {
   plugins: [
     new CleanWebpackPlugin({
       verbose: true,
-    }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: "static",
-      openAnalyzer: false,
-      reportFilename: path.resolve(__dirname, "bundle-report.html"),
     }),
   ],
 };
