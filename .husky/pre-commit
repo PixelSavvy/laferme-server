@@ -1,13 +1,19 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+# Color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+RESET='\033[0m' # Reset color
 
-echo "🚀 Hold tight! Preparing to launch your commit..."
+echo -e "${CYAN}🚀 Hold tight! Preparing to launch your commit...${RESET}"
 npx lint-staged
+
 if [ $? -eq 0 ]; then
-  echo "✨✨✨ All systems go! Your code is shinier than a unicorn's horn 🦄."
+  echo -e "${GREEN}✨✨✨ All systems go! Your code is shinier than a unicorn's horn 🦄.${RESET}"
 else
-  echo "💥💔 Oops! Your code is broken like my last relationship. Fix it before committing!"
+  echo -e "${RED}💥💔 Oops! Your code is broken like my last relationship. Fix it before committing!${RESET}"
   exit 1
 fi
 
-echo "🎉 Commit ready to blast off! 🚀✨"
+echo -e "${YELLOW}🎉 Commit ready to blast off! 🚀✨${RESET}"

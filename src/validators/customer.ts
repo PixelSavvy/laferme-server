@@ -3,9 +3,7 @@ import { z } from "zod";
 import { productSchema } from "./product";
 
 const REQUIRED_ERROR_MSG = "სავალდებულოა";
-const GEORGIAN_REGEX = new RegExp(
-  "^[ა-ჰ\\s.,?!:;\"'()\\-+@#$%^&*<>[\\]{}|\\\\/]+$"
-);
+const GEORGIAN_REGEX = new RegExp("^[ა-ჰ\\s.,?!:;\"'()\\-+@#$%^&*<>[\\]{}|\\\\/]+$");
 
 const customerProductsSchema = productSchema.pick({ id: true });
 
@@ -22,9 +20,7 @@ const newCustomerSchema = z.object({
   phone: z.string({
     required_error: REQUIRED_ERROR_MSG,
   }),
-  email: z
-    .string({ required_error: REQUIRED_ERROR_MSG })
-    .email({ message: "არასწორი ფორმატი" }),
+  email: z.string({ required_error: REQUIRED_ERROR_MSG }).email({ message: "არასწორი ფორმატი" }),
   needInvoice: z.enum(["0", "1"], {
     message: REQUIRED_ERROR_MSG,
   }),

@@ -65,10 +65,7 @@ export default tseslint.config(
           singleReturnOnly: false,
         },
       ],
-      "prefer-arrow-callback": [
-        "error",
-        { allowNamedFunctions: false, allowUnboundThis: true },
-      ],
+      "prefer-arrow-callback": ["error", { allowNamedFunctions: false, allowUnboundThis: true }],
       "no-restricted-syntax": [
         "error",
         {
@@ -81,14 +78,7 @@ export default tseslint.config(
       "import/no-unresolved": [
         "error",
         {
-          ignore: [
-            "\\.css$",
-            "\\.scss$",
-            "\\.jpg$",
-            "\\.jpeg$",
-            "\\.png$",
-            "\\.svg$",
-          ],
+          ignore: ["\\.css$", "\\.scss$", "\\.jpg$", "\\.jpeg$", "\\.png$", "\\.svg$"],
         },
       ],
       "import/order": [
@@ -146,10 +136,7 @@ export default tseslint.config(
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-empty-object-type": [
-        "error",
-        { allowInterfaces: "with-single-extends" },
-      ],
+      "@typescript-eslint/no-empty-object-type": ["error", { allowInterfaces: "with-single-extends" }],
       "@typescript-eslint/consistent-type-definitions": ["warn", "type"],
 
       // Naming conventions for TypeScript, enforcing consistency across types, variables, and functions
@@ -184,5 +171,5 @@ export default tseslint.config(
         },
       ],
     },
-  },
+  }
 );

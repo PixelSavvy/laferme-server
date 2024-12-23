@@ -1,10 +1,4 @@
-import {
-  BelongsToManySetAssociationsMixin,
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { z } from "zod";
 
 import { sequelize } from "@/lib";
@@ -21,10 +15,7 @@ const customerSchema = schema.omit({
 
 interface CustomerInstance
   extends z.infer<typeof customerSchema>,
-    Model<
-      InferAttributes<CustomerInstance>,
-      InferCreationAttributes<CustomerInstance, { omit: "id" }>
-    > {
+    Model<InferAttributes<CustomerInstance>, InferCreationAttributes<CustomerInstance, { omit: "id" }>> {
   setProducts: BelongsToManySetAssociationsMixin<ProductInstance, number>;
 }
 

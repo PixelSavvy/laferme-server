@@ -1,10 +1,4 @@
-import {
-  Association,
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { Association, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { z } from "zod";
 
 import { orderStatus } from "@/config";
@@ -22,15 +16,9 @@ const freezoneItemSchema = schema.omit({
 
 interface FreezoneItemInstance
   extends z.infer<typeof freezoneItemSchema>,
-    Model<
-      InferAttributes<FreezoneItemInstance>,
-      InferCreationAttributes<FreezoneItemInstance>
-    > {
+    Model<InferAttributes<FreezoneItemInstance>, InferCreationAttributes<FreezoneItemInstance>> {
   products?: Association<FreezoneItemInstance, FreezoneItemProductInstance>;
-  updateProducts: BelongsToManySetAssociationsMixin<
-    FreezoneItemProductInstance[],
-    number
-  >;
+  updateProducts: BelongsToManySetAssociationsMixin<FreezoneItemProductInstance[], number>;
 }
 
 const FreezoneItem = sequelize.define<FreezoneItemInstance>(

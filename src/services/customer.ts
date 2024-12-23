@@ -8,11 +8,7 @@ import { sendResponse } from "@/helpers";
 import { sequelize } from "@/lib";
 import { Op } from "sequelize";
 
-const addCustomer = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof newCustomerSchema>
-) => {
+const addCustomer = async (req: Request, res: Response, data: z.infer<typeof newCustomerSchema>) => {
   const transaction = await sequelize.transaction();
   try {
     // Check if the customer with the same email already exists
@@ -156,11 +152,7 @@ const deleteCustomer = async (req: Request, res: Response, id: string) => {
 
     if (!foundCustomer) {
       await transaction.rollback();
-      return sendResponse(
-        res,
-        404,
-        "სარეალიზაციო პუნქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!"
-      );
+      return sendResponse(res, 404, "სარეალიზაციო პუნქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!");
     }
 
     await foundCustomer.destroy({ transaction });

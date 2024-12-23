@@ -7,11 +7,7 @@ import { sendResponse } from "@/helpers";
 import { Customer, Order, OrderProduct, Product } from "@/models";
 import { newOrderSchema, updateOrderSchema } from "@/validators";
 
-const addOrder = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof newOrderSchema>
-) => {
+const addOrder = async (req: Request, res: Response, data: z.infer<typeof newOrderSchema>) => {
   const transaction = await sequelize.transaction();
   try {
     const existingCustomer = await Customer.findByPk(data.customerId, {
@@ -134,11 +130,7 @@ const deleteOrder = async (req: Request, res: Response, id: number) => {
 
     if (!foundOrder) {
       await transaction.rollback();
-      return sendResponse(
-        res,
-        404,
-        "შეკვეთა მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!"
-      );
+      return sendResponse(res, 404, "შეკვეთა მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!");
     }
 
     await foundOrder.destroy({ transaction });
@@ -158,11 +150,7 @@ const deleteOrder = async (req: Request, res: Response, id: number) => {
   }
 };
 
-const updateOrder = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof updateOrderSchema>
-) => {
+const updateOrder = async (req: Request, res: Response, data: z.infer<typeof updateOrderSchema>) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -195,19 +183,13 @@ const updateOrder = async (
       const newProductIds = products.map((p) => p.productId);
 
       // Identify products to be added
-      const productsToAdd = products.filter(
-        (p) => !existingProductIds.includes(p.productId)
-      );
+      const productsToAdd = products.filter((p) => !existingProductIds.includes(p.productId));
 
       // Identify products to be updated (those that already exist)
-      const productsToUpdate = products.filter((p) =>
-        existingProductIds.includes(p.productId)
-      );
+      const productsToUpdate = products.filter((p) => existingProductIds.includes(p.productId));
 
       // Identify products to be removed (those that no longer exist in the new list)
-      const productsToRemove = existingOrderProducts.filter(
-        (p) => !newProductIds.includes(p.productId)
-      );
+      const productsToRemove = existingOrderProducts.filter((p) => !newProductIds.includes(p.productId));
 
       // 1. Remove old products no longer in the order
       await OrderProduct.destroy({
@@ -227,9 +209,7 @@ const updateOrder = async (
 
       // 3. Update existing products
       for (const product of productsToUpdate) {
-        const orderProduct = existingOrderProducts.find(
-          (p) => p.productId === product.productId
-        );
+        const orderProduct = existingOrderProducts.find((p) => p.productId === product.productId);
         if (orderProduct) {
           await orderProduct.update(product, { transaction });
         }

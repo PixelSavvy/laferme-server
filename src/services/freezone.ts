@@ -1,23 +1,12 @@
 import { sendResponse } from "@/helpers";
 import { sequelize } from "@/lib";
-import {
-  Customer,
-  FreezoneItem,
-  FreezoneItemProduct,
-  Order,
-  OrderProduct,
-  Product,
-} from "@/models";
+import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from "@/models";
 import { updateFreezoneItemSchema, updateOrderSchema } from "@/validators";
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { z } from "zod";
 
-const addFreezoneItem = async (
-  req: Request,
-  res: Response,
-  orderId: number
-) => {
+const addFreezoneItem = async (req: Request, res: Response, orderId: number) => {
   const transaction = await sequelize.transaction();
   try {
     // Fetch associated order
@@ -54,10 +43,7 @@ const addFreezoneItem = async (
       adjustedQuantity: 0,
     }));
 
-    const freezoneItemProducts = await FreezoneItemProduct.bulkCreate(
-      transformedFreezoneItemProducts,
-      { transaction }
-    );
+    const freezoneItemProducts = await FreezoneItemProduct.bulkCreate(transformedFreezoneItemProducts, { transaction });
 
     if (freezoneItemProducts.length === 0) return;
 
@@ -82,23 +68,13 @@ const getFreezoneItem = async (req: Request, res: Response, id: number) => {
           attributes: ["id", "title", "productCode"],
           through: {
             as: "freezoneDetails",
-            attributes: [
-              "weight",
-              "quantity",
-              "adjustedWeight",
-              "adjustedQuantity",
-            ],
+            attributes: ["weight", "quantity", "adjustedWeight", "adjustedQuantity"],
           },
         },
       ],
     });
 
-    if (!freezoneItem)
-      return sendResponse(
-        res,
-        404,
-        "მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა"
-      );
+    if (!freezoneItem) return sendResponse(res, 404, "მსგავსი შეკვეთა თავისუფალ ზონაში ვერ მოიძებნა");
 
     return freezoneItem;
   } catch (error) {
@@ -116,13 +92,7 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
           attributes: ["id", "title", "productCode"],
           through: {
             as: "freezoneDetails",
-            attributes: [
-              "weight",
-              "quantity",
-              "adjustedWeight",
-              "adjustedQuantity",
-              "price",
-            ],
+            attributes: ["weight", "quantity", "adjustedWeight", "adjustedQuantity", "price"],
           },
         },
       ],
@@ -171,11 +141,7 @@ const getFreezoneItems = async (req: Request, res: Response, id: number) => {
   }
 };
 
-const updateFreezoneItem = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof updateFreezoneItemSchema>
-) => {
+const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typeof updateFreezoneItemSchema>) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -220,11 +186,7 @@ const updateFreezoneItem = async (
   }
 };
 
-const updateFreezoneItemOnOrderUpdate = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof updateOrderSchema>
-) => {
+const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data: z.infer<typeof updateOrderSchema>) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -244,9 +206,7 @@ const updateFreezoneItemOnOrderUpdate = async (
     const newProducts = [];
 
     for (const product of existingProducts) {
-      const updatedProduct = orderProducts.find(
-        (p) => p.productId === product.productId
-      );
+      const updatedProduct = orderProducts.find((p) => p.productId === product.productId);
 
       // If the product is updated, check if there's any difference
       if (updatedProduct) {
@@ -269,9 +229,7 @@ const updateFreezoneItemOnOrderUpdate = async (
 
     // Add new products that do not exist in existing products
     for (const product of orderProducts) {
-      const existingProduct = existingProducts.find(
-        (p) => p.productId === product.productId
-      );
+      const existingProduct = existingProducts.find((p) => p.productId === product.productId);
 
       if (!existingProduct) {
         newProducts.push({

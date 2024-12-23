@@ -7,15 +7,9 @@ const getProducts = async (req: Request, res: Response) => {
   try {
     const foundProducts = await productServices.getProducts(req, res);
 
-    if (!foundProducts.length)
-      return sendResponse(res, 200, "პროდუქტები ვერ მოიძებნა", []);
+    if (!foundProducts.length) return sendResponse(res, 200, "პროდუქტები ვერ მოიძებნა", []);
 
-    return sendResponse(
-      res,
-      200,
-      "პროდუქტები წარმატებით მოიძებნა",
-      foundProducts
-    );
+    return sendResponse(res, 200, "პროდუქტები წარმატებით მოიძებნა", foundProducts);
   } catch (error) {
     console.error(error);
     return sendResponse(res, 505, "შეცდომა პროდუქტების ძებნისას", error);
@@ -29,8 +23,7 @@ const getProduct = async (req: Request, res: Response) => {
   try {
     const foundProduct = await productServices.getProduct(req, res, id);
 
-    if (!foundProduct)
-      return sendResponse(res, 404, "პროდუქტი ვერ მოიძებნა", {});
+    if (!foundProduct) return sendResponse(res, 404, "პროდუქტი ვერ მოიძებნა", {});
 
     return sendResponse(res, 200, "პროდუქტი წარმატებით მოიძებნა", foundProduct);
   } catch (error) {
@@ -47,13 +40,7 @@ const addProduct = async (req: Request, res: Response) => {
   const parsedData = newProductSchema.safeParse(data);
 
   // If the data does not match the schema, return server error to the clinet
-  if (!parsedData.success)
-    return sendResponse(
-      res,
-      400,
-      "Validation error",
-      parsedData.error.format()
-    );
+  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   // If the data parsed successfully, follow the addProduct service
   try {
@@ -61,20 +48,10 @@ const addProduct = async (req: Request, res: Response) => {
     const result = await productServices.addProduct(req, res, parsedData.data);
 
     // If the product was not added (wrong input)
-    if (result.exists)
-      return sendResponse(
-        res,
-        409,
-        "პროდუქტი მსგავსი პროდუქტის კოდით არსებობს"
-      );
+    if (result.exists) return sendResponse(res, 409, "პროდუქტი მსგავსი პროდუქტის კოდით არსებობს");
 
     // If product added successfully
-    return sendResponse(
-      res,
-      201,
-      "პროდუქტი წარმატებით დაემატა",
-      result.product
-    );
+    return sendResponse(res, 201, "პროდუქტი წარმატებით დაემატა", result.product);
   } catch (error) {
     console.error("Error adding a product:", error);
     return sendResponse(res, 500, "შეცდომა პროდუქტის შექმნისას", error);
@@ -86,35 +63,15 @@ const updateProduct = async (req: Request, res: Response) => {
 
   const parsedData = productSchema.safeParse(data);
 
-  if (!parsedData.success)
-    return sendResponse(
-      res,
-      400,
-      "Validation error",
-      parsedData.error.format()
-    );
+  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   try {
-    const updatedProduct = await productServices.updateProduct(
-      req,
-      res,
-      parsedData.data
-    );
+    const updatedProduct = await productServices.updateProduct(req, res, parsedData.data);
 
     if (!updatedProduct.exists)
-      return sendResponse(
-        res,
-        404,
-        "პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა",
-        updatedProduct.product
-      );
+      return sendResponse(res, 404, "პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა", updatedProduct.product);
 
-    return sendResponse(
-      res,
-      200,
-      "პროდუქტი წარმატებით განახლდა",
-      updatedProduct
-    );
+    return sendResponse(res, 200, "პროდუქტი წარმატებით განახლდა", updatedProduct);
   } catch (error) {
     console.error(error);
     return sendResponse(res, 505, "შეცდომა პროდუქტის რედაქტირებისას", error);

@@ -1,19 +1,11 @@
 import { sequelize } from "@/lib";
 import { freezoneItemProductsSchema } from "@/validators";
-import {
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { z } from "zod";
 
 interface FreezoneItemProductInstance
   extends z.infer<typeof freezoneItemProductsSchema>,
-    Model<
-      InferAttributes<FreezoneItemProductInstance>,
-      InferCreationAttributes<FreezoneItemProductInstance>
-    > {}
+    Model<InferAttributes<FreezoneItemProductInstance>, InferCreationAttributes<FreezoneItemProductInstance>> {}
 
 const FreezoneItemProduct = sequelize.define<FreezoneItemProductInstance>(
   "FreezoneItemProduct",

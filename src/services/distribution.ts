@@ -15,11 +15,7 @@ import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { z } from "zod";
 
-const addDistributionItem = async (
-  req: Request,
-  res: Response,
-  freezoneItemId: number
-) => {
+const addDistributionItem = async (req: Request, res: Response, freezoneItemId: number) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -39,20 +35,15 @@ const addDistributionItem = async (
       raw: true,
     });
 
-    const transformedDistributionItemProducts = freezoneItemProducts.map(
-      (product) => ({
-        ...product,
-        distributionItemId: newDistributionItem.id,
-        distributedWeight: 0,
-      })
-    );
+    const transformedDistributionItemProducts = freezoneItemProducts.map((product) => ({
+      ...product,
+      distributionItemId: newDistributionItem.id,
+      distributedWeight: 0,
+    }));
 
-    const distributionItemProducts = await DistributionItemProduct.bulkCreate(
-      transformedDistributionItemProducts,
-      {
-        transaction,
-      }
-    );
+    const distributionItemProducts = await DistributionItemProduct.bulkCreate(transformedDistributionItemProducts, {
+      transaction,
+    });
 
     if (distributionItemProducts.length === 0) return;
 
@@ -83,18 +74,13 @@ const getDistributionItem = async (req: Request, res: Response, id: number) => {
           attributes: ["id", "title", "productCode"],
           through: {
             as: "details",
-            attributes: [
-              "adjustedWeight",
-              "adjustedQuantity",
-              "distributedWeight",
-            ],
+            attributes: ["adjustedWeight", "adjustedQuantity", "distributedWeight"],
           },
         },
       ],
     });
 
-    if (!distributionItem)
-      return sendResponse(res, 404, "მსგავსი დისტრიბუცია ვერ მოიძებნა");
+    if (!distributionItem) return sendResponse(res, 404, "მსგავსი დისტრიბუცია ვერ მოიძებნა");
 
     return distributionItem;
   } catch (error) {
@@ -129,9 +115,7 @@ const getDistributionItems = async (req: Request, res: Response) => {
         data: existingDistributionItems,
       };
 
-    const orderIds = existingDistributionItems.map(
-      (item) => item.freezone!.orderId
-    );
+    const orderIds = existingDistributionItems.map((item) => item.freezone!.orderId);
 
     const customers = await Order.findAll({
       where: {
@@ -150,18 +134,14 @@ const getDistributionItems = async (req: Request, res: Response) => {
       ],
     });
 
-    const transformedDistributionItems = existingDistributionItems.map(
-      (item) => {
-        const order = customers.find(
-          (customer) => customer.id === item.freezone?.orderId
-        );
+    const transformedDistributionItems = existingDistributionItems.map((item) => {
+      const order = customers.find((customer) => customer.id === item.freezone?.orderId);
 
-        return {
-          ...item.toJSON(),
-          customer: order?.customer,
-        };
-      }
-    );
+      return {
+        ...item.toJSON(),
+        customer: order?.customer,
+      };
+    });
 
     return {
       exists: true,
@@ -172,11 +152,7 @@ const getDistributionItems = async (req: Request, res: Response) => {
   }
 };
 
-const updateDistributionItem = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof distributionItemSchema>
-) => {
+const updateDistributionItem = async (req: Request, res: Response, data: z.infer<typeof distributionItemSchema>) => {
   const transaction = await sequelize.transaction();
 
   try {
@@ -194,10 +170,7 @@ const updateDistributionItem = async (
 
     const { products, ...distributionItemData } = data;
     // Update the order
-    const updatedDistributionItem = await existingDistributionItem.update(
-      distributionItemData,
-      { transaction }
-    );
+    const updatedDistributionItem = await existingDistributionItem.update(distributionItemData, { transaction });
 
     // Rebuild the `FreezoneItemProduct` associations
     const distributionItemProducts = data.products.map((product) => ({

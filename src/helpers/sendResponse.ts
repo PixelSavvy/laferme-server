@@ -1,11 +1,6 @@
 import { Response } from "express";
 
-export const sendResponse = <T>(
-  res: Response,
-  status: number,
-  message: string,
-  data?: T,
-) => {
+export const sendResponse = <T>(res: Response, status: number, message: string, data?: T) => {
   // If there is data, send to the client
   if (data !== undefined) {
     return res.status(status).json({

@@ -7,11 +7,7 @@ import { sequelize } from "@/lib";
 import { Product } from "@/models";
 import { newProductSchema, productSchema } from "@/validators";
 
-const addProduct = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof newProductSchema>
-) => {
+const addProduct = async (req: Request, res: Response, data: z.infer<typeof newProductSchema>) => {
   const transaction = await sequelize.transaction();
   try {
     const existingProduct = await Product.findOne({
@@ -69,11 +65,7 @@ const deleteProduct = async (req: Request, res: Response, id: string) => {
 
     if (!foundProduct) {
       await transaction.rollback();
-      return sendResponse(
-        res,
-        404,
-        "პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!"
-      );
+      return sendResponse(res, 404, "პროდუქტი მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!");
     }
 
     await foundProduct.destroy({ transaction });
@@ -93,11 +85,7 @@ const deleteProduct = async (req: Request, res: Response, id: string) => {
   }
 };
 
-const updateProduct = async (
-  req: Request,
-  res: Response,
-  data: z.infer<typeof productSchema>
-) => {
+const updateProduct = async (req: Request, res: Response, data: z.infer<typeof productSchema>) => {
   const transaction = await sequelize.transaction();
 
   try {

@@ -33,8 +33,4 @@ const distributionItemSchema = newDistributionItemSchema.extend({
   deletedAt: z.coerce.date().nullable().optional(),
 });
 
-export {
-  distributionItemProductsSchema,
-  distributionItemSchema,
-  newDistributionItemSchema,
-};
+export { distributionItemProductsSchema, distributionItemSchema, newDistributionItemSchema };

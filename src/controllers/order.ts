@@ -10,13 +10,7 @@ const addOrder = async (req: Request, res: Response) => {
 
   const parsedData = newOrderSchema.safeParse(data);
 
-  if (!parsedData.success)
-    return sendResponse(
-      res,
-      400,
-      "Validation error",
-      parsedData.error.format()
-    );
+  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   try {
     const orderId = await orderServices.addOrder(req, res, parsedData.data);
@@ -26,19 +20,11 @@ const addOrder = async (req: Request, res: Response) => {
       return sendResponse(res, 500, "შეცდომა შეკვეთის შექმნისას");
     }
 
-    const freezoneItemId = await freezoneServices.addFreezoneItem(
-      req,
-      res,
-      orderId
-    );
+    const freezoneItemId = await freezoneServices.addFreezoneItem(req, res, orderId);
 
     if (!freezoneItemId) {
       await transaction.rollback();
-      return sendResponse(
-        res,
-        500,
-        "შეცდომა შეკვეთის თავისუფალ ზონაში დამატებისას"
-      );
+      return sendResponse(res, 500, "შეცდომა შეკვეთის თავისუფალ ზონაში დამატებისას");
     }
 
     await transaction.commit();
@@ -56,8 +42,7 @@ const getOrder = async (req: Request, res: Response) => {
   try {
     const order = await orderServices.getOrder(req, res, Number(id));
 
-    if (!order.exists)
-      return sendResponse(res, 202, "შეკვეთა ვერ მოიძებნა", order.order);
+    if (!order.exists) return sendResponse(res, 202, "შეკვეთა ვერ მოიძებნა", order.order);
 
     return sendResponse(res, 201, "შეკვეთა წარმატებით მოიძებნა!", order.order);
   } catch (error) {
@@ -70,20 +55,9 @@ const getOrders = async (req: Request, res: Response) => {
   try {
     const foundOrders = await orderServices.getOrders(req, res);
 
-    if (!foundOrders.exists)
-      return sendResponse(
-        res,
-        202,
-        "შეკვეთები ვერ მოიძებნა",
-        foundOrders.orders
-      );
+    if (!foundOrders.exists) return sendResponse(res, 202, "შეკვეთები ვერ მოიძებნა", foundOrders.orders);
 
-    return sendResponse(
-      res,
-      200,
-      "შეკვეთები წარმატებით მოიძებნა",
-      foundOrders.orders
-    );
+    return sendResponse(res, 200, "შეკვეთები წარმატებით მოიძებნა", foundOrders.orders);
   } catch (error) {
     console.error(error);
     return sendResponse(res, 500, "შეცდომა შეკვეთების ძებნისას", error);
@@ -107,40 +81,21 @@ const updateOrder = async (req: Request, res: Response) => {
 
   const parsedData = updateOrderSchema.safeParse(data);
 
-  if (!parsedData.success)
-    return sendResponse(
-      res,
-      400,
-      "Validation error",
-      parsedData.error.format()
-    );
+  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   try {
-    const updatedOrder = await orderServices.updateOrder(
-      req,
-      res,
-      parsedData.data
-    );
+    const updatedOrder = await orderServices.updateOrder(req, res, parsedData.data);
 
     if (!updatedOrder.exists) {
       await transaction.rollback();
       return sendResponse(res, 404, "შეკვეთა ვერ მოიძებნა", updatedOrder.order);
     }
 
-    const updatedFreezoneItem =
-      await freezoneServices.updateFreezoneItemOnOrderUpdate(
-        req,
-        res,
-        parsedData.data
-      );
+    const updatedFreezoneItem = await freezoneServices.updateFreezoneItemOnOrderUpdate(req, res, parsedData.data);
 
     if (!updatedFreezoneItem.success) {
       await transaction.rollback();
-      return sendResponse(
-        res,
-        500,
-        "შეცდომა შეკვეთის თავისუფალ ზონის განახლებისას"
-      );
+      return sendResponse(res, 500, "შეცდომა შეკვეთის თავისუფალ ზონის განახლებისას");
     }
 
     await transaction.commit();

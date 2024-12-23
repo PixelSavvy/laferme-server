@@ -1,10 +1,4 @@
-import {
-  BelongsToManySetAssociationsMixin,
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { BelongsToManySetAssociationsMixin, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { z } from "zod";
 
 import { orderStatus } from "@/config";
@@ -22,10 +16,7 @@ const orderSchema = schema.omit({
 
 interface OrderInstance
   extends z.infer<typeof orderSchema>,
-    Model<
-      InferAttributes<OrderInstance>,
-      InferCreationAttributes<OrderInstance, { omit: "id" }>
-    > {
+    Model<InferAttributes<OrderInstance>, InferCreationAttributes<OrderInstance, { omit: "id" }>> {
   products?: OrderProductInstance[];
   customer?: CustomerInstance;
 

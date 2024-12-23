@@ -1,9 +1,4 @@
-import {
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 import { z } from "zod";
 
 import { distributionStatus } from "@/config";
@@ -20,10 +15,7 @@ const distributionItemSchema = schema.omit({
 
 interface DistributionItemSchema
   extends z.infer<typeof distributionItemSchema>,
-    Model<
-      InferAttributes<DistributionItemSchema>,
-      InferCreationAttributes<DistributionItemSchema, { omit: "id" }>
-    > {
+    Model<InferAttributes<DistributionItemSchema>, InferCreationAttributes<DistributionItemSchema, { omit: "id" }>> {
   freezone?: FreezoneItemInstance;
 }
 

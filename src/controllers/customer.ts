@@ -7,23 +7,12 @@ const getCustomers = async (req: Request, res: Response) => {
   try {
     const foundProducts = await customerServices.getCustomers(req, res);
 
-    if (!foundProducts.length)
-      return sendResponse(res, 200, "სარეალიზაციო პუნქტები ვერ მოიძებნა", []);
+    if (!foundProducts.length) return sendResponse(res, 200, "სარეალიზაციო პუნქტები ვერ მოიძებნა", []);
 
-    return sendResponse(
-      res,
-      200,
-      "სარეალიზაციო პუნქტი წარმატებით მოიძებნა",
-      foundProducts
-    );
+    return sendResponse(res, 200, "სარეალიზაციო პუნქტი წარმატებით მოიძებნა", foundProducts);
   } catch (error) {
     console.error(error);
-    return sendResponse(
-      res,
-      505,
-      "შეცდომა სარეალიზაციო პუნქტების ძებნისას",
-      error
-    );
+    return sendResponse(res, 505, "შეცდომა სარეალიზაციო პუნქტების ძებნისას", error);
   }
 };
 
@@ -31,23 +20,12 @@ const getCustomer = async (req: Request, res: Response) => {
   try {
     const foundProducts = await customerServices.getCustomer(req, res);
 
-    if (!foundProducts.length)
-      return sendResponse(res, 200, "სარეალიზაციო პუნქტი ვერ მოიძებნა", []);
+    if (!foundProducts.length) return sendResponse(res, 200, "სარეალიზაციო პუნქტი ვერ მოიძებნა", []);
 
-    return sendResponse(
-      res,
-      200,
-      "სარეალიზაციო პუნქტი წარმატებით მოიძებნა",
-      foundProducts
-    );
+    return sendResponse(res, 200, "სარეალიზაციო პუნქტი წარმატებით მოიძებნა", foundProducts);
   } catch (error) {
     console.error(error);
-    return sendResponse(
-      res,
-      505,
-      "შეცდომა სარეალიზაციო პუნქტის ძებნისას",
-      error
-    );
+    return sendResponse(res, 505, "შეცდომა სარეალიზაციო პუნქტის ძებნისას", error);
   }
 };
 
@@ -56,44 +34,19 @@ const addCustomer = async (req: Request, res: Response) => {
 
   const parsedData = newCustomerSchema.safeParse(data);
 
-  if (!parsedData.success)
-    return sendResponse(
-      res,
-      400,
-      "Validation error",
-      parsedData.error.format()
-    );
+  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   try {
-    const newCustomer = await customerServices.addCustomer(
-      req,
-      res,
-      parsedData.data
-    );
+    const newCustomer = await customerServices.addCustomer(req, res, parsedData.data);
 
     // wrong input
     if (newCustomer.exists)
-      return sendResponse(
-        res,
-        400,
-        "სარეალიზაციო პუნქტი მსგავსი ელ.ფოსტით უკვე არსებობს",
-        newCustomer.customer
-      );
+      return sendResponse(res, 400, "სარეალიზაციო პუნქტი მსგავსი ელ.ფოსტით უკვე არსებობს", newCustomer.customer);
 
-    return sendResponse(
-      res,
-      201,
-      "სარეალიზაციო პუნქტი წარმატებით დაემატა",
-      newCustomer
-    );
+    return sendResponse(res, 201, "სარეალიზაციო პუნქტი წარმატებით დაემატა", newCustomer);
   } catch (error) {
     console.error("Error adding a customer:", error);
-    return sendResponse(
-      res,
-      500,
-      "შეცდომა სარეალიზაციო პუნქტის შექმნისას",
-      error
-    );
+    return sendResponse(res, 500, "შეცდომა სარეალიზაციო პუნქტის შექმნისას", error);
   }
 };
 
@@ -102,18 +55,10 @@ const updateCustomer = async (req: Request, res: Response) => {
 
   const parsedData = customerSchema.safeParse(data);
 
-  if (!parsedData.success)
-    return sendResponse(
-      res,
-      400,
-      "Validation error",
-      parsedData.error.format()
-    );
+  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   try {
-    const updatedCustomer = await customerServices.updateCustomer(
-      parsedData.data
-    );
+    const updatedCustomer = await customerServices.updateCustomer(parsedData.data);
 
     if (!updatedCustomer.exists)
       return sendResponse(
@@ -123,20 +68,10 @@ const updateCustomer = async (req: Request, res: Response) => {
         updatedCustomer.customer
       );
 
-    return sendResponse(
-      res,
-      200,
-      "სარეალიზაციო პუნქტი წარმატებით განახლდა",
-      updatedCustomer
-    );
+    return sendResponse(res, 200, "სარეალიზაციო პუნქტი წარმატებით განახლდა", updatedCustomer);
   } catch (error) {
     console.error(error);
-    return sendResponse(
-      res,
-      505,
-      "შეცდომა სარეალიზაციო პუნქტის რედაქტირებისას",
-      error
-    );
+    return sendResponse(res, 505, "შეცდომა სარეალიზაციო პუნქტის რედაქტირებისას", error);
   }
 };
 
@@ -147,12 +82,7 @@ const deleteCustomer = async (req: Request, res: Response) => {
     await customerServices.deleteCustomer(req, res, id);
   } catch (error) {
     console.error(error);
-    return sendResponse(
-      res,
-      505,
-      "შეცდომა სარეალიზაციო პუნქტის წაშლისას",
-      error
-    );
+    return sendResponse(res, 505, "შეცდომა სარეალიზაციო პუნქტის წაშლისას", error);
   }
 };
 

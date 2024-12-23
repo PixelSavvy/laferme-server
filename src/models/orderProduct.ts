@@ -1,16 +1,8 @@
 import { sequelize } from "@/lib";
-import {
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
-  Model,
-} from "sequelize";
+import { DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
 
 interface OrderProductInstance
-  extends Model<
-    InferAttributes<OrderProductInstance>,
-    InferCreationAttributes<OrderProductInstance>
-  > {
+  extends Model<InferAttributes<OrderProductInstance>, InferCreationAttributes<OrderProductInstance>> {
   orderId: number;
   productId: number;
   quantity: number;

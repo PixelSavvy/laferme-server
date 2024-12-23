@@ -35,9 +35,4 @@ const updateFreezoneItemSchema = z.object({
   products: z.array(freezoneItemProductsSchema),
 });
 
-export {
-  freezoneItemProductsSchema,
-  freezoneItemSchema,
-  newFreezoneItemSchema,
-  updateFreezoneItemSchema,
-};
+export { freezoneItemProductsSchema, freezoneItemSchema, newFreezoneItemSchema, updateFreezoneItemSchema };
