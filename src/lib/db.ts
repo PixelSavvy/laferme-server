@@ -12,7 +12,7 @@ const sequelize = new Sequelize(getEnvVar("DB_URL"), config);
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log("Database connected!");
+    console.log("Successfully connected to the database!");
     await sequelize.query(`CREATE SCHEMA IF NOT EXISTS operations`);
 
     if (getEnvVar("NODE_ENV") === "development") {
