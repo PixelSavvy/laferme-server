@@ -3,13 +3,13 @@
   "scripts": {
     "build": "rimraf dist && webpack --config webpack.production.js",
     "dev": "tsx watch --env-file=.env.development  src/index.ts",
-    "prod": "node -r tsconfig-paths/register dist/index.cjs",
+    "prod": "npm run build && node -r tsconfig-paths/register dist/index.cjs",
+    "prepare": "husky",
     "lint": "eslint . --cache --format  stylish --fix",
-    "format": "npx prettier . --write",
-    "prepare": "husky"
+    "format": "npx prettier . --write"
   },
   "lint-staged": {
-    "*.ts, *.js": [
+    "**/*.{js,ts}": [
       "npm run lint && npm run format"
     ]
   },
