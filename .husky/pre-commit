@@ -1,0 +1,13 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Hold tight! Preparing to launch your commit..."
+npx lint-staged
+if [ $? -eq 0 ]; then
+  echo "✨✨✨ All systems go! Your code is shinier than a unicorn's horn 🦄."
+else
+  echo "💥💔 Oops! Your code is broken like my last relationship. Fix it before committing!"
+  exit 1
+fi
+
+echo "🎉 Commit ready to blast off! 🚀✨"
