@@ -2,19 +2,15 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist && webpack --config webpack.production.js",
+    "preserve": "npm run build",
+    "serve": "npm run preserve && node -r tsconfig-paths/register dist/index.cjs",
     "dev": "tsx watch --env-file=.env.development  src/index.ts",
-    "prod": "npm run build && node -r tsconfig-paths/register dist/index.cjs",
+    "lint": "eslint . --cache --format  stylish --fix",
+    "format": "prettier --write",
     "prepare": "husky"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
-      "eslint . --cache --format  stylish --fix",
-      "prettier --write"
-    ],
-    "**/*.{json,md,css,scss,html,js,jsx,ts,tsx}": [
-      "npx prettier . --write"
-    ],
-    "*.js": "eslint --cache --fix"
+    "*.{ts,js}": "npm run lint && npm run format"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
