@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "build": "rimraf dist && webpack --config webpack.production.js",
+    "build": "rimraf dist && webpack --config webpack.config.js",
     "preserve": "npm run build",
     "serve": "node -r tsconfig-paths/register dist/index.cjs"
   },
