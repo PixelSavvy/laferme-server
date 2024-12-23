@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "build": "rimraf dist && webpack --config webpack.production.js",
-    "prod": "npm run build && node -r tsconfig-paths/register dist/index.cjs"
+    "preserve": "npm run build",
+    "serve": "node -r tsconfig-paths/register dist/index.cjs"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
