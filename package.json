@@ -3,11 +3,13 @@
   "scripts": {
     "dev": "tsx watch --env-file=.env.development  src/index.ts",
     "prepare": "husky",
-    "format": "prettier --write src/**/*.ts",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint . --cache --format  stylish --fix",
+    "format": "npx prettier . --write"
   },
   "lint-staged": {
-    "*.ts": "npm run lint && npm run format"
+    "**/*.{js,ts}": [
+      "npm run lint && npm run format"
+    ]
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
