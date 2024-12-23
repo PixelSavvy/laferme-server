@@ -4,7 +4,7 @@
     "build": "rimraf dist && webpack --config webpack.production.js",
     "dev": "tsx watch --env-file=.env.development  src/index.ts",
     "prod": "npm run build && node -r tsconfig-paths/register dist/index.cjs",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
