@@ -7,7 +7,7 @@ import { Sequelize } from "sequelize";
 const environment = getEnvVar("NODE_ENV") as "development" | "production";
 const config = dbConfig[environment];
 
-const sequelize = new Sequelize(config);
+const sequelize = new Sequelize(getEnvVar("DB_URL"), config);
 
 const connectDB = async () => {
   try {
