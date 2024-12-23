@@ -3,7 +3,7 @@
   "scripts": {
     "build": "rimraf dist && webpack --config webpack.config.js",
     "preserve": "npm run build",
-    "serve": "node -r tsconfig-paths/register dist/index.cjs"
+    "serve": "npm run preserve && node -r tsconfig-paths/register dist/index.cjs"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
