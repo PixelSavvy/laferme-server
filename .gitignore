@@ -33,7 +33,7 @@ build/
 .env.local
 .env.*.local
 
-dist
+
 
 # Test coverage
 coverage/
