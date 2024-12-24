@@ -19,10 +19,24 @@ const addDistributionItem = async (req: Request, res: Response, freezoneItemId: 
   const transaction = await sequelize.transaction();
 
   try {
+    const existingDistributionItem = await DistributionItem.findOne({
+      where: {
+        freezoneItemId,
+      },
+    });
+
+    if (existingDistributionItem) {
+      await transaction.rollback();
+      return {
+        exists: true,
+        distributionItem: existingDistributionItem,
+      };
+    }
+
     const newDistributionItem = await DistributionItem.create(
       {
         freezoneItemId,
-        status: distributionStatus[3000],
+        status: distributionStatus[0],
       },
       { transaction }
     );
@@ -49,7 +63,10 @@ const addDistributionItem = async (req: Request, res: Response, freezoneItemId: 
 
     await transaction.commit();
 
-    return newDistributionItem;
+    return {
+      exists: false,
+      distributionItem: newDistributionItem,
+    };
   } catch (error) {
     await transaction.rollback();
     throw error;
@@ -205,9 +222,54 @@ const updateDistributionItem = async (req: Request, res: Response, data: z.infer
   }
 };
 
+const deleteDistributionItem = async (req: Request, res: Response, freezoneItemId: number) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const foundDistributionItem = await DistributionItem.findOne({
+      where: {
+        freezoneItemId,
+      },
+    });
+
+    if (!foundDistributionItem)
+      return {
+        exists: false,
+        distributionItem: foundDistributionItem,
+      };
+
+    // Delete the distribution item
+    await foundDistributionItem.destroy({ transaction });
+    // Delete the associated products
+    await DistributionItemProduct.destroy({ where: { distributionItemId: foundDistributionItem.id }, transaction });
+
+    // Verify the distribution item is no longer in the database
+
+    const checkDeleted = await DistributionItem.findOne({
+      where: {
+        freezoneItemId,
+      },
+    });
+
+    if (checkDeleted) {
+      await transaction.rollback();
+      return {
+        exists: true,
+        distributionItem: checkDeleted,
+      };
+    }
+
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 export const distributionServices = {
   addDistributionItem,
   getDistributionItem,
   getDistributionItems,
   updateDistributionItem,
+  deleteDistributionItem,
 };

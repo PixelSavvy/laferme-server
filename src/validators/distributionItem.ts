@@ -6,12 +6,14 @@ const REQUIRED_ERROR_MSG = "სავალდებულოა";
 
 const distributionItemProductsSchema = freezoneItemProductsSchema
   .extend({
+    distributionItemId: z.number().nonnegative(),
     distributedWeight: z.number().nonnegative(),
   })
   .omit({
     quantity: true,
     weight: true,
     adjustedQuantity: true,
+    freezoneItemId: true,
   });
 
 const newDistributionItemSchema = z.object({

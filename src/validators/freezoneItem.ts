@@ -35,4 +35,17 @@ const updateFreezoneItemSchema = z.object({
   products: z.array(freezoneItemProductsSchema),
 });
 
-export { freezoneItemProductsSchema, freezoneItemSchema, newFreezoneItemSchema, updateFreezoneItemSchema };
+const updateFreezoneItemStatusSchema = z.object({
+  id: z.number().nonnegative(),
+  status: z.enum(orderStatus, {
+    required_error: REQUIRED_ERROR_MSG,
+  }),
+});
+
+export {
+  freezoneItemProductsSchema,
+  freezoneItemSchema,
+  newFreezoneItemSchema,
+  updateFreezoneItemSchema,
+  updateFreezoneItemStatusSchema,
+};

@@ -2,6 +2,6 @@ export const paymentOptions = ["CASH", "CONSIGNMENT", "TRANSFER", "TRIAL", "DISC
 
 export const orderStatus = ["PREPARING", "PREPARED", "CANCELLED", "RETURNED"] as [string, ...string[]];
 
-export const distributionStatus = ["TODELIVER", "DELIVERING", "DELIVERED"] as [string, ...string[]];
+export const distributionStatus = ["READYTODELIVER", "DELIVERING", "DELIVERED"] as [string, ...string[]];
 
 export const priceIndex = ["TR1", "TR2", "TR3", "TR4", "TR5", "TRD", "TRC"] as [string, ...string[]];

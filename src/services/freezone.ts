@@ -1,7 +1,7 @@
 import { sendResponse } from "@/helpers";
 import { sequelize } from "@/lib";
 import { Customer, FreezoneItem, FreezoneItemProduct, Order, OrderProduct, Product } from "@/models";
-import { updateFreezoneItemSchema, updateOrderSchema } from "@/validators";
+import { updateFreezoneItemSchema, updateFreezoneItemStatusSchema, updateOrderSchema } from "@/validators";
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { z } from "zod";
@@ -316,11 +316,49 @@ const deleteFreezoneItem = async (req: Request, res: Response, id: number) => {
   }
 };
 
+const updateFreezoneItemStatus = async (
+  req: Request,
+  res: Response,
+  data: z.infer<typeof updateFreezoneItemStatusSchema>
+) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const existingFreezoneItem = await FreezoneItem.findByPk(data.id, {});
+
+    if (!existingFreezoneItem) {
+      await transaction.rollback();
+      return {
+        exists: false,
+        freezoneItem: existingFreezoneItem,
+      };
+    }
+
+    const updatedFreezoneItem = await existingFreezoneItem.update(
+      {
+        status: data.status,
+      },
+      { transaction }
+    );
+
+    await transaction.commit();
+
+    return {
+      exists: true,
+      freezoneItem: updatedFreezoneItem,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 export const freezoneServices = {
   addFreezoneItem,
   getFreezoneItem,
   getFreezoneItems,
   updateFreezoneItem,
   updateFreezoneItemOnOrderUpdate,
+  updateFreezoneItemStatus,
   deleteFreezoneItem,
 };

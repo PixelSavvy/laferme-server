@@ -38,10 +38,13 @@ const updateFreezoneItem = async (req: Request, res: Response) => {
   if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
 
   try {
+    // Update the order in freezone
     const updatedFreezoneItem = await freezoneServices.updateFreezoneItem(req, res, parsedData.data);
 
     if (!updatedFreezoneItem.exists)
       return sendResponse(res, 202, "შეკვეთა ვერ მოიძებნა", updatedFreezoneItem.freezoneItem);
+
+    // Update the order in distribution
 
     return sendResponse(res, 200, "შეკვეთა წარმატებით განახლდა", updatedFreezoneItem.freezoneItem);
   } catch (error) {

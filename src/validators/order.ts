@@ -9,6 +9,7 @@ const orderProductSchema = z.object({
       required_error: REQUIRED_ERROR_MSG,
     })
     .nonnegative(),
+
   quantity: z
     .number({
       required_error: REQUIRED_ERROR_MSG,
@@ -47,4 +48,11 @@ const updateOrderSchema = z.object({
   products: z.array(orderProductSchema),
 });
 
-export { newOrderSchema, orderProductSchema, orderSchema, updateOrderSchema };
+const updateOrderStatusSchema = z.object({
+  id: z.number().nonnegative(),
+  status: z.enum(orderStatus, {
+    required_error: REQUIRED_ERROR_MSG,
+  }),
+});
+
+export { newOrderSchema, orderProductSchema, orderSchema, updateOrderSchema, updateOrderStatusSchema };
