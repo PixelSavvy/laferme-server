@@ -3,17 +3,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "preserve": "npm run build",
-    "serve": "npm run preserve && node --env-file=.env.production -r tsconfig-paths/register dist/index.min.cjs",
-    "dev": "tsx watch --env-file=.env.development src/index.ts",
-    "lint": "eslint . --cache --cache-location .cache/.eslintcache --format  stylish --fix",
-    "format": "prettier --write  --cache --cache-location .cache/.prettiercache .",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{ts,js}": [
-      "npm run lint",
-      "npm run format"
-    ]
+    "serve": "npm run preserve && node --env-file=.env.production -r tsconfig-paths/register dist/index.min.cjs"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

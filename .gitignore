@@ -74,5 +74,3 @@ Thumbs.db
 # Nuxt.js build output
 .nuxt/
 
-# Dist directory
-dist/
