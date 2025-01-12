@@ -24,8 +24,4 @@ router.route(`${paths.app.order}/:id`).patch(async (req, res) => {
   await orderController.updateOrder(req, res);
 });
 
-router.route(`${paths.app.order}/:id/:status`).patch(async (req, res) => {
-  await orderController.updateOrderStatus(req, res);
-});
-
 export const orderRoutes = router;

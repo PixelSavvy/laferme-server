@@ -166,10 +166,32 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
     await existingFreezoneItem.update(
       {
         isUpdated: true,
+        status: data.status,
       },
       {
         transaction,
       }
+    );
+
+    // Update status of the associated order
+
+    const order = await Order.findByPk(data.id, {
+      transaction,
+    });
+
+    if (!order) {
+      await transaction.rollback();
+      return {
+        exists: false,
+        freezoneItem: existingFreezoneItem,
+      };
+    }
+
+    await order.update(
+      {
+        status: data.status,
+      },
+      { transaction }
     );
 
     // Rebuild the `FreezoneItemProduct` associations
@@ -201,11 +223,11 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
   const transaction = await sequelize.transaction();
 
   try {
-    const { products: orderProducts, id: orderId } = data;
+    const { products: orderProducts, ...orderData } = data;
 
     // Fetch the existing freezone item and update dueDateAt
 
-    const existingFreezoneItem = await FreezoneItem.findByPk(orderId, { transaction });
+    const existingFreezoneItem = await FreezoneItem.findByPk(orderData.id, { transaction });
 
     if (!existingFreezoneItem) {
       await transaction.rollback();
@@ -219,7 +241,7 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
 
     await existingFreezoneItem.update(
       {
-        dueDateAt: data.dueDateAt,
+        ...orderData,
       },
       { transaction }
     );
@@ -227,7 +249,7 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
     // Fetch all the products associated with the current freezoneItemId (orderId)
     const existingProducts = await FreezoneItemProduct.findAll({
       where: {
-        freezoneItemId: orderId,
+        freezoneItemId: orderData.id,
       },
       transaction,
     });
@@ -265,7 +287,7 @@ const updateFreezoneItemOnOrderUpdate = async (req: Request, res: Response, data
 
       if (!existingProduct) {
         newProducts.push({
-          freezoneItemId: orderId,
+          freezoneItemId: orderData.id,
           adjustedQuantity: 0, // Set adjustedQuantity to 0 for new products
           adjustedWeight: 0, // Set adjustedWeight to 0 for new products
           ...product, // Merge product data

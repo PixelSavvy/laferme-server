@@ -38,6 +38,7 @@ const updateFreezoneItemSchema = z.object({
   products: z.array(freezoneItemProductsSchema),
   dueDateAt: z.coerce.date(),
   isUpdated: z.boolean(),
+  status: z.enum(freezoneStatuses),
 });
 
 const updateFreezoneItemStatusSchema = z.object({
