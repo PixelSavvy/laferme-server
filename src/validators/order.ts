@@ -49,6 +49,7 @@ const updateOrderSchema = z.object({
   id: z.number().nonnegative(),
   products: z.array(orderProductSchema),
   dueDateAt: z.coerce.date(),
+  status: z.enum(orderStatuses),
 });
 
 const updateOrderStatusSchema = z.object({

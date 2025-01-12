@@ -1,8 +1,7 @@
-import { statuses } from "@/config";
 import { sendResponse } from "@/helpers";
 import { sequelize } from "@/lib";
 import { distributionServices, freezoneServices, orderServices } from "@/services";
-import { newOrderSchema, updateOrderSchema, updateOrderStatusSchema } from "@/validators";
+import { newOrderSchema, updateOrderSchema } from "@/validators";
 import { Request, Response } from "express";
 
 const addOrder = async (req: Request, res: Response) => {
@@ -100,6 +99,17 @@ const updateOrder = async (req: Request, res: Response) => {
       return sendResponse(res, 500, "შეცდომა შეკვეთის თავისუფალ ზონის განახლებისას");
     }
 
+    // Create a new distribution item if status === READYTODELIVER
+
+    if (parsedData.data.status === "READYTODELIVER") {
+      const distributionItemId = await distributionServices.addDistributionItem(req, res, parsedData.data.id);
+
+      if (!distributionItemId) {
+        await transaction.rollback();
+        return sendResponse(res, 500, "შეცდომა შეკვეთის განახლებისას");
+      }
+    }
+
     await transaction.commit();
 
     return sendResponse(res, 200, "შეკვეთა წარმატებით განახლდა");
@@ -110,48 +120,10 @@ const updateOrder = async (req: Request, res: Response) => {
   }
 };
 
-const updateOrderStatus = async (req: Request, res: Response) => {
-  const transaction = await sequelize.transaction();
-  const { id, status } = req.params;
-
-  const parsedData = updateOrderStatusSchema.safeParse({ id: Number(id), status });
-
-  if (!parsedData.success) return sendResponse(res, 400, "Validation error", parsedData.error.format());
-
-  try {
-    const updatedOrder = await orderServices.updateOrderStatus(req, res, parsedData.data);
-
-    if (!updatedOrder.exists) {
-      await transaction.rollback();
-      return sendResponse(res, 404, "შეკვეთა ვერ მოიძებნა", updatedOrder.order);
-    }
-
-    const updatedFreezoneItem = await freezoneServices.updateFreezoneItemStatus(req, res, parsedData.data);
-
-    if (!updatedFreezoneItem.exists) {
-      await transaction.rollback();
-      return sendResponse(res, 500, "შეცდომა შეკვეთის თავისუფალ ზონაში სტატუსის განახლებისას");
-    }
-
-    // If the status === 'READYTODELIVER', create a distribution item
-    if (status === statuses.order.READYTODELIVER) {
-      await distributionServices.addDistributionItem(req, res, parsedData.data.id);
-    }
-
-    await transaction.commit();
-    return sendResponse(res, 200, "შეკვეთის სტატუსი წარმატებით განახლდა", updatedOrder.order);
-  } catch (error) {
-    await transaction.rollback();
-    console.error("Error updating an order status:", error);
-    return sendResponse(res, 500, "შეცდომა შეკვეთის სტატუსის განახლებისას", error);
-  }
-};
-
 export const orderController = {
   addOrder,
   getOrder,
   getOrders,
   deleteOrder,
   updateOrder,
-  updateOrderStatus,
 };
