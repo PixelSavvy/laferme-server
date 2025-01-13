@@ -4,7 +4,7 @@ import { z } from "zod";
 import { sequelize } from "@/lib";
 
 import { sendResponse } from "@/helpers";
-import { Customer, Order, OrderProduct, Product } from "@/models";
+import { Customer, DistributionItem, FreezoneItem, Order, OrderProduct, Product } from "@/models";
 import { newOrderSchema, updateOrderSchema } from "@/validators";
 
 const addOrder = async (req: Request, res: Response, data: z.infer<typeof newOrderSchema>) => {
@@ -126,29 +126,29 @@ const getOrders = async (req: Request, res: Response) => {
 const deleteOrder = async (req: Request, res: Response, id: number) => {
   const transaction = await sequelize.transaction();
   try {
-    const foundOrder = await Order.findByPk(id, { transaction });
+    const existingOrder = await Order.findByPk(id, { transaction });
+    const existingFreezoneItem = await FreezoneItem.findByPk(id, { transaction });
+    const existingDistributionItem = await DistributionItem.findByPk(id, { transaction });
 
-    if (!foundOrder) {
+    // If Order and FreezoneItem do not exist, return early
+    if (!existingOrder || !existingFreezoneItem) {
       await transaction.rollback();
-      return sendResponse(res, 404, "შეკვეთა მსგავსი საიდენტიფიკაციო კოდით ვერ მოიძებნა!");
+      return sendResponse(res, 404, "Order or Freezone Item not found.");
     }
 
-    // Delete the order
-    await foundOrder.destroy({ transaction });
-
-    // Delete the associated products
-
-    await OrderProduct.destroy({ where: { orderId: id }, transaction });
-
-    // Verify the order is no longer in the database
-    const checkDeleted = await Order.findByPk(id, { transaction });
-    if (checkDeleted) {
-      await transaction.rollback();
-      return sendResponse(res, 500, "შეკვეთის წაშლა ვერ მოხერხდა!");
+    // Delete DistributionItem if it exists
+    if (existingDistributionItem) {
+      await existingDistributionItem.destroy({ transaction });
+      console.log("Distribution item deleted successfully");
     }
+    // Delete FreezoneItem and Order
+    await existingFreezoneItem.destroy({ transaction });
+    await existingOrder.destroy({ transaction });
+
+    console.log("Order and FreezoneItem deleted successfully");
 
     await transaction.commit();
-    return sendResponse(res, 200, "შეკვეთა წარმატებით წაიშალა!");
+    return sendResponse(res, 200, "Order and associated items deleted successfully.");
   } catch (error) {
     await transaction.rollback();
     throw error;
@@ -235,10 +235,44 @@ const updateOrder = async (req: Request, res: Response, data: z.infer<typeof upd
   }
 };
 
+export const updateOrderStatus = async (req: Request, res: Response, id: number, status: string) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Fetch the existing order from DB
+    const existingOrder = await Order.findByPk(id, { transaction });
+
+    // Handle the case where order does not exist
+    if (!existingOrder) {
+      await transaction.rollback();
+      return {
+        exists: false,
+        existingOrder: null,
+      };
+    }
+
+    // Update the order status
+    await existingOrder.update({ status }, { transaction });
+
+    // Commit the transaction
+    await transaction.commit();
+
+    return {
+      exists: true,
+      existingOrder,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    console.error("Error updating order status:", error);
+    throw error;
+  }
+};
+
 export const orderServices = {
   addOrder,
   getOrder,
   getOrders,
   deleteOrder,
   updateOrder,
+  updateOrderStatus,
 };

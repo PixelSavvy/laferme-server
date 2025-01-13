@@ -13,14 +13,14 @@ const distributionItemSchema = schema.omit({
   deletedAt: true,
 });
 
-interface DistributionItemSchema
+interface DistributionItemInstance
   extends z.infer<typeof distributionItemSchema>,
-    Model<InferAttributes<DistributionItemSchema>, InferCreationAttributes<DistributionItemSchema, { omit: "id" }>> {
+    Model<InferAttributes<DistributionItemInstance>, InferCreationAttributes<DistributionItemInstance, { omit: "id" }>> {
   freezone?: FreezoneItemInstance;
   total: number;
 }
 
-const DistributionItem = sequelize.define<DistributionItemSchema>(
+const DistributionItem = sequelize.define<DistributionItemInstance>(
   "DistributionItem",
   {
     id: {
@@ -66,4 +66,4 @@ const DistributionItem = sequelize.define<DistributionItemSchema>(
   }
 );
 
-export { DistributionItem, type DistributionItemSchema };
+export { DistributionItem, type DistributionItemInstance };

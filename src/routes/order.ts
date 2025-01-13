@@ -20,8 +20,8 @@ router.route(paths.app.order).get(async (req, res) => {
   await orderController.getOrders(req, res);
 });
 
-router.route(`${paths.app.order}/:id`).patch(async (req, res) => {
-  await orderController.updateOrder(req, res);
+router.route(`${paths.app.order}/:id`).patch(async (req, res, next) => {
+  await orderController.updateOrder(req, res, next);
 });
 
 export const orderRoutes = router;

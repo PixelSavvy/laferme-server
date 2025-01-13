@@ -4,6 +4,7 @@ import { sequelize } from "@/lib";
 import {
   Customer,
   DistributionItem,
+  DistributionItemInstance,
   DistributionItemProduct,
   FreezoneItem,
   FreezoneItemProduct,
@@ -92,6 +93,39 @@ const addDistributionItem = async (req: Request, res: Response, freezoneItemId: 
   }
 };
 
+const updateDistributionItemStatus = async (
+  req: Request,
+  res: Response,
+  id: number,
+  status: DistributionItemInstance["status"]
+) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const existingDistributionItem = await DistributionItem.findByPk(id, { transaction });
+
+    if (!existingDistributionItem) {
+      await transaction.rollback();
+      return {
+        exists: false,
+        distributionItem: existingDistributionItem,
+      };
+    }
+
+    await existingDistributionItem.update({ status }, { transaction });
+
+    await transaction.commit();
+
+    return {
+      exists: true,
+      distributionItem: existingDistributionItem,
+    };
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
 const getDistributionItem = async (req: Request, res: Response, id: number) => {
   try {
     const distributionItem = await DistributionItem.findByPk(id, {
@@ -125,6 +159,7 @@ const getDistributionItem = async (req: Request, res: Response, id: number) => {
 };
 
 const getDistributionItems = async (req: Request, res: Response) => {
+  const transaction = await sequelize.transaction();
   try {
     const existingDistributionItems = await DistributionItem.findAll({
       include: [
@@ -145,12 +180,13 @@ const getDistributionItems = async (req: Request, res: Response) => {
       ],
     });
 
-    if (existingDistributionItems.length === 0)
+    if (existingDistributionItems.length === 0) {
+      await transaction.rollback();
       return {
         exists: false,
         data: existingDistributionItems,
       };
-
+    }
     const orderIds = existingDistributionItems.map((item) => item.freezone!.orderId);
 
     const customers = await Order.findAll({
@@ -179,11 +215,14 @@ const getDistributionItems = async (req: Request, res: Response) => {
       };
     });
 
+    await transaction.commit();
+
     return {
       exists: true,
       data: transformedDistributionItems,
     };
   } catch (error) {
+    await transaction.rollback();
     throw error;
   }
 };
@@ -247,38 +286,20 @@ const deleteDistributionItem = async (req: Request, res: Response, freezoneItemI
   try {
     const foundDistributionItem = await DistributionItem.findOne({
       where: {
-        freezoneItemId,
+        id: freezoneItemId,
       },
     });
 
-    if (!foundDistributionItem)
-      return {
-        exists: false,
-        distributionItem: foundDistributionItem,
-      };
+    if (!foundDistributionItem) return;
 
     // Delete the distribution item
-    await foundDistributionItem.destroy({ transaction });
+    await foundDistributionItem?.destroy({ transaction });
+
     // Delete the associated products
-    await DistributionItemProduct.destroy({ where: { distributionItemId: foundDistributionItem.id }, transaction });
+    await DistributionItemProduct.destroy({ where: { distributionItemId: foundDistributionItem?.id }, transaction });
 
-    // Verify the distribution item is no longer in the database
-
-    const checkDeleted = await DistributionItem.findOne({
-      where: {
-        freezoneItemId,
-      },
-    });
-
-    if (checkDeleted) {
-      await transaction.rollback();
-      return {
-        exists: true,
-        distributionItem: checkDeleted,
-      };
-    }
-
-    await transaction.commit();
+    console.log("Deleted distribution item:", foundDistributionItem);
+    return true;
   } catch (error) {
     await transaction.rollback();
     throw error;
@@ -291,4 +312,5 @@ export const distributionServices = {
   getDistributionItems,
   updateDistributionItem,
   deleteDistributionItem,
+  updateDistributionItemStatus,
 };
