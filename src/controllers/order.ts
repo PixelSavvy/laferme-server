@@ -113,7 +113,6 @@ const updateOrder = async (req: Request, res: Response, next: NextFunction) => {
 
     // Update distribution item if status === CANCELLED or RETURNED
     if (parsedData.data.status === statuses.order.CANCELLED || parsedData.data.status === statuses.order.RETURNED) {
-      console.log(true);
       await distributionServices.updateDistributionItemStatus(req, res, parsedData.data.id, parsedData.data.status);
     }
 
