@@ -180,6 +180,8 @@ const getDistributionItems = async (req: Request, res: Response) => {
       ],
     });
 
+    console.log("Existing distribution items:", existingDistributionItems);
+
     if (existingDistributionItems.length === 0) {
       await transaction.rollback();
       return {
