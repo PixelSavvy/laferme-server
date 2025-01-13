@@ -46,6 +46,7 @@ const addDistributionItem = async (req: Request, res: Response, freezoneItemId: 
 
     const newDistributionItem = await DistributionItem.create(
       {
+        id: freezoneItemId,
         freezoneItemId,
         status: statuses.distribution.READYTODELIVER,
         total: 0,
@@ -180,8 +181,6 @@ const getDistributionItems = async (req: Request, res: Response) => {
       ],
     });
 
-    console.log("Existing distribution items:", existingDistributionItems);
-
     if (existingDistributionItems.length === 0) {
       await transaction.rollback();
       return {
@@ -300,7 +299,6 @@ const deleteDistributionItem = async (req: Request, res: Response, freezoneItemI
     // Delete the associated products
     await DistributionItemProduct.destroy({ where: { distributionItemId: foundDistributionItem?.id }, transaction });
 
-    console.log("Deleted distribution item:", foundDistributionItem);
     return true;
   } catch (error) {
     await transaction.rollback();

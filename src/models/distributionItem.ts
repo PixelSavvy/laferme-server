@@ -15,7 +15,7 @@ const distributionItemSchema = schema.omit({
 
 interface DistributionItemInstance
   extends z.infer<typeof distributionItemSchema>,
-    Model<InferAttributes<DistributionItemInstance>, InferCreationAttributes<DistributionItemInstance, { omit: "id" }>> {
+    Model<InferAttributes<DistributionItemInstance>, InferCreationAttributes<DistributionItemInstance>> {
   freezone?: FreezoneItemInstance;
   total: number;
 }
