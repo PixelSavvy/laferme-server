@@ -173,27 +173,6 @@ const updateFreezoneItem = async (req: Request, res: Response, data: z.infer<typ
       }
     );
 
-    // Update status of the associated order
-
-    const order = await Order.findByPk(data.id, {
-      transaction,
-    });
-
-    if (!order) {
-      await transaction.rollback();
-      return {
-        exists: false,
-        freezoneItem: existingFreezoneItem,
-      };
-    }
-
-    await order.update(
-      {
-        status: data.status,
-      },
-      { transaction }
-    );
-
     // Rebuild the `FreezoneItemProduct` associations
     const freezoneItemProducts = data.products.map((product) => ({
       ...product,
@@ -337,17 +316,8 @@ const deleteFreezoneItem = async (req: Request, res: Response, id: number) => {
       transaction,
     });
 
-    // If the freezone item does not exist, return an error
-    if (!existingFreezoneItem) {
-      await transaction.rollback();
-      return {
-        exists: false,
-        freezoneItem: existingFreezoneItem,
-      };
-    }
-
     // Delete the freezone item
-    await existingFreezoneItem.destroy({ transaction });
+    await existingFreezoneItem?.destroy({ transaction });
 
     // Delete all associated products
     await FreezoneItemProduct.destroy({
@@ -360,10 +330,7 @@ const deleteFreezoneItem = async (req: Request, res: Response, id: number) => {
     // Commit the transaction
     await transaction.commit();
 
-    return {
-      exists: true,
-      freezoneItem: existingFreezoneItem,
-    };
+    return true;
   } catch (error) {
     await transaction.rollback();
     throw error;

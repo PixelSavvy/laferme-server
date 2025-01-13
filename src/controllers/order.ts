@@ -1,8 +1,9 @@
+import { statuses } from "@/config";
 import { sendResponse } from "@/helpers";
 import { sequelize } from "@/lib";
 import { distributionServices, freezoneServices, orderServices } from "@/services";
 import { newOrderSchema, updateOrderSchema } from "@/validators";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 const addOrder = async (req: Request, res: Response) => {
   const transaction = await sequelize.transaction();
@@ -68,15 +69,13 @@ const deleteOrder = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await orderServices.deleteOrder(req, res, Number(id));
-    await freezoneServices.deleteFreezoneItem(req, res, Number(id));
-    await distributionServices.deleteDistributionItem(req, res, Number(id));
   } catch (error) {
     console.error("Error deleting an order:", error);
     return sendResponse(res, 500, "შეცდომა შეკვეთის წაშლისას", error);
   }
 };
 
-const updateOrder = async (req: Request, res: Response) => {
+const updateOrder = async (req: Request, res: Response, next: NextFunction) => {
   const data = req.body;
   const transaction = await sequelize.transaction();
 
@@ -92,22 +91,30 @@ const updateOrder = async (req: Request, res: Response) => {
       return sendResponse(res, 404, "შეკვეთა ვერ მოიძებნა", updatedOrder.order);
     }
 
-    const updatedFreezoneItem = await freezoneServices.updateFreezoneItemOnOrderUpdate(req, res, parsedData.data);
+    // Update freezone item if status === ACCEPTED
+    if (parsedData.data.status === statuses.freezone.ACCEPTED) {
+      const updatedFreezoneItem = await freezoneServices.updateFreezoneItemOnOrderUpdate(req, res, parsedData.data);
 
-    if (!updatedFreezoneItem.success) {
-      await transaction.rollback();
-      return sendResponse(res, 500, "შეცდომა შეკვეთის თავისუფალ ზონის განახლებისას");
+      if (updatedFreezoneItem.exists) {
+        await transaction.rollback();
+        return next();
+      }
     }
 
     // Create a new distribution item if status === READYTODELIVER
-
-    if (parsedData.data.status === "READYTODELIVER") {
+    if (parsedData.data.status === statuses.order.READYTODELIVER) {
       const distributionItemId = await distributionServices.addDistributionItem(req, res, parsedData.data.id);
 
-      if (!distributionItemId) {
+      if (distributionItemId?.exists) {
         await transaction.rollback();
-        return sendResponse(res, 500, "შეცდომა შეკვეთის განახლებისას");
+        return next();
       }
+    }
+
+    // Update distribution item if status === CANCELLED or RETURNED
+    if (parsedData.data.status === statuses.order.CANCELLED || parsedData.data.status === statuses.order.RETURNED) {
+      console.log(true);
+      await distributionServices.updateDistributionItemStatus(req, res, parsedData.data.id, parsedData.data.status);
     }
 
     await transaction.commit();
