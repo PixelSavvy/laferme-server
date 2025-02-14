@@ -1,0 +1,18 @@
+# Color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+MAGENTA='\033[0;35m'  # Magenta
+RESET='\033[0m' # Reset color
+
+echo -e "${MAGENTA}🚀 Hold tight! Preparing to launch your commit...${RESET}"
+npx lint-staged
+
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}✨✨✨ All systems go! Your code is shinier than a unicorn's horn 🦄.${RESET}"
+else
+  echo -e "${RED}💥💔 Oops! Your code is broken like my last relationship. Fix it before committing!${RESET}"
+  exit 1
+fi
+
+echo -e "${YELLOW}🎉 Commit ready to blast off! 🚀✨${RESET}"
